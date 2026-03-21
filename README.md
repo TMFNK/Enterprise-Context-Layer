@@ -47,17 +47,17 @@ There are three distinct integration points, described fully in [Section 11 (Sup
 3. [Architecture Overview](#3-architecture-overview)
 4. [Repository Structure](#4-repository-structure)
 5. [The Three Foundational Patterns](#5-the-three-foundational-patterns)
-6. [Step 1;  Discover Your Company's Knowledge Domains](#step-1--discover-your-companys-knowledge-domains)
-7. [Step 2;  Map Your Data Sources](#step-2--map-your-data-sources)
-8. [Step 3;  Define Source Authority](#step-3--define-source-authority)
-9. [Step 4;  Create the Meta Seed Files](#step-4--create-the-meta-seed-files)
-10. [Step 5;  Write the System Prompt](#step-5--write-the-system-prompt)
+6. [Step 1:  Discover Your Company's Knowledge Domains](#step-1--discover-your-companys-knowledge-domains)
+7. [Step 2:  Map Your Data Sources](#step-2--map-your-data-sources)
+8. [Step 3:  Define Source Authority](#step-3--define-source-authority)
+9. [Step 4:  Create the Meta Seed Files](#step-4--create-the-meta-seed-files)
+10. [Step 5:  Write the System Prompt](#step-5--write-the-system-prompt)
 11. [Superpowers Integration](#11-superpowers-integration)
-12. [Step 6;  Build the Task System](#step-6--build-the-task-system)
-13. [Step 7;  Implement the Worker Loop](#step-7--implement-the-worker-loop)
-14. [Step 8;  Seed the Initial Content](#step-8--seed-the-initial-content)
-15. [Step 9;  Run the Maintenance Agent](#step-9--run-the-maintenance-agent)
-16. [Step 10;  Build the Query Interface](#step-10--build-the-query-interface)
+12. [Step 6:  Build the Task System](#step-6--build-the-task-system)
+13. [Step 7:  Implement the Worker Loop](#step-7--implement-the-worker-loop)
+14. [Step 8:  Seed the Initial Content](#step-8--seed-the-initial-content)
+15. [Step 9:  Run the Maintenance Agent](#step-9--run-the-maintenance-agent)
+16. [Step 10:  Build the Query Interface](#step-10--build-the-query-interface)
 17. [Citation Rules](#17-citation-rules)
 18. [The Context Graph: Backlinks and Cross-References](#18-the-context-graph-backlinks-and-cross-references)
 19. [Source Reliability and Conflict Resolution](#19-source-reliability-and-conflict-resolution)
@@ -338,7 +338,7 @@ The ECL also *stores* skills as domain content, making team processes first-clas
 
 ---
 
-## Step 1;  Discover Your Company's Knowledge Domains
+## Step 1:  Discover Your Company's Knowledge Domains
 
 **Who does this:** An LLM agent with access to the company's documentation, org chart, and a human point of contact.
 
@@ -388,7 +388,7 @@ Create `meta/domain-index.md` with entries like:
 
 ---
 
-## Step 2;  Map Your Data Sources
+## Step 2:  Map Your Data Sources
 
 **Who does this:** An LLM agent with a human providing access credentials or API tokens.
 
@@ -439,7 +439,7 @@ For each domain defined in Step 1, document the sources in `meta/domain-index.md
 
 ---
 
-## Step 3;  Define Source Authority
+## Step 3:  Define Source Authority
 
 **Who does this:** LLM agent, informed by a human domain expert for each domain.
 
@@ -484,7 +484,7 @@ For each domain, produce an explicit table. Example for the engineering domain:
 
 ---
 
-## Step 4;  Create the Meta Seed Files
+## Step 4:  Create the Meta Seed Files
 
 **Who does this:** LLM agent.
 
@@ -579,7 +579,7 @@ The completed domain index from Step 1. Used by agents to understand the full sc
 
 ---
 
-## Step 5;  Write the System Prompt
+## Step 5:  Write the System Prompt
 
 **Who does this:** LLM agent in collaboration with a human reviewer.
 
@@ -757,7 +757,7 @@ This workflow is particularly valuable for ECL tooling because the ECL worker lo
 
 ---
 
-## Step 6;  Build the Task System
+## Step 6:  Build the Task System
 
 **Who does this:** Engineer or LLM agent writing the runner script.
 
@@ -830,7 +830,7 @@ def claim_task(repo):
 
 ---
 
-## Step 7;  Implement the Worker Loop
+## Step 7:  Implement the Worker Loop
 
 **Who does this:** Engineer writing the runner script.
 
@@ -914,7 +914,7 @@ Every task execution is wrapped in a try/except. On failure:
 
 ---
 
-## Step 8;  Seed the Initial Content
+## Step 8:  Seed the Initial Content
 
 **Who does this:** LLM agent, running as a `seed` command before the worker loop starts.
 
@@ -937,7 +937,7 @@ feat(seed): import {N} files from {source_description}
 
 ---
 
-## Step 9;  Run the Maintenance Agent
+## Step 9:  Run the Maintenance Agent
 
 **Who does this:** A dedicated agent process running on a schedule (e.g., every 6 hours).
 
@@ -995,13 +995,13 @@ Global checks:
 
 ---
 
-## Step 10;  Build the Query Interface
+## Step 10:  Build the Query Interface
 
 **Who does this:** Engineer, after the ECL has initial content.
 
 **When:** After at least one full worker run has populated the major domain files.
 
-### Option A;  Claude Code with Superpowers (recommended)
+### Option A:  Claude Code with Superpowers (recommended)
 
 Give Claude Code access to the ECL repository and ensure Superpowers is installed. The combined setup gives you:
 
@@ -1025,7 +1025,7 @@ If the ECL says to route this question, tell the user who to route to and why.
 If you are designing a solution, follow the brainstorming skill before producing output.
 ```
 
-### Option B;  Direct API query agent
+### Option B:  Direct API query agent
 
 A lightweight Python script that:
 
@@ -1036,7 +1036,7 @@ A lightweight Python script that:
 
 Sufficient for most use cases. No vector database required for ECL repositories up to ~10,000 files.
 
-### Option C;  Full RAG pipeline
+### Option C:  Full RAG pipeline
 
 For large ECLs (>10,000 files) or high query volume:
 
