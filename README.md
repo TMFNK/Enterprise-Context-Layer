@@ -1,7 +1,7 @@
 # Enterprise Context Layer (ECL)
 
-> *"The central intelligence that encompasses all knowledge for your company — able to answer any question, self-updating, built from ~1000 lines of Python and a Git repo."*
-> — Andy Chen, [The Enterprise Context Layer](https://andychen32.substack.com/p/the-enterprise-context-layer)
+> *"The central intelligence that encompasses all knowledge for your company. It is able to answer any question, self-updating, built from ~1000 lines of Python and a Git repo."*
+>  Andy Chen, [The Enterprise Context Layer](https://andychen32.substack.com/p/the-enterprise-context-layer)
 
 ---
 
@@ -9,9 +9,9 @@
 
 The Enterprise Context Layer is not a database. It is not a search engine. It is not a chatbot.
 
-It is a **living, self-maintaining Git repository** that encodes how your company actually works — the institutional memory, judgment calls, org behaviour, process reality, and cross-domain relationships that no retrieval system can derive on its own.
+It is a **living, self-maintaining Git repository** that encodes how your company actually works; the institutional memory, judgment calls, org behaviour, process reality, and cross-domain relationships that no retrieval system can derive on its own.
 
-Traditional RAG (Retrieval-Augmented Generation) fetches documents. The ECL synthesises understanding. When a sales rep asks "how long do we keep customer data after churn?", a retrieval system returns the closest policy document. The ECL returns: *"Don't answer this yourself — route to the security team. Here is why, with three cited incidents where reps got this wrong."*
+Traditional RAG (Retrieval-Augmented Generation) fetches documents. The ECL synthesises understanding. When a sales rep asks "how long do we keep customer data after churn?", a retrieval system returns the closest policy document. The ECL returns: *"Don't answer this yourself; route to the security team. Here is why, with three cited incidents where reps got this wrong."*
 
 The difference is synthesis over retrieval. The ECL contains the reasoning frameworks your experts use, not just the raw facts they work with.
 
@@ -26,16 +26,16 @@ The difference is synthesis over retrieval. The ECL contains the reasoning frame
 3. [Architecture Overview](#3-architecture-overview)
 4. [Repository Structure](#4-repository-structure)
 5. [The Two Foundational Patterns](#5-the-two-foundational-patterns)
-6. [Step 1 — Discover Your Company's Knowledge Domains](#step-1--discover-your-companys-knowledge-domains)
-7. [Step 2 — Map Your Data Sources](#step-2--map-your-data-sources)
-8. [Step 3 — Define Source Authority](#step-3--define-source-authority)
-9. [Step 4 — Create the Meta Seed Files](#step-4--create-the-meta-seed-files)
-10. [Step 5 — Write the System Prompt](#step-5--write-the-system-prompt)
-11. [Step 6 — Build the Task System](#step-6--build-the-task-system)
-12. [Step 7 — Implement the Worker Loop](#step-7--implement-the-worker-loop)
-13. [Step 8 — Seed the Initial Content](#step-8--seed-the-initial-content)
-14. [Step 9 — Run the Maintenance Agent](#step-9--run-the-maintenance-agent)
-15. [Step 10 — Build the Query Interface](#step-10--build-the-query-interface)
+6. [Step 1; Discover Your Company's Knowledge Domains](#step-1--discover-your-companys-knowledge-domains)
+7. [Step 2; Map Your Data Sources](#step-2--map-your-data-sources)
+8. [Step 3; Define Source Authority](#step-3--define-source-authority)
+9. [Step 4; Create the Meta Seed Files](#step-4--create-the-meta-seed-files)
+10. [Step 5; Write the System Prompt](#step-5--write-the-system-prompt)
+11. [Step 6; Build the Task System](#step-6--build-the-task-system)
+12. [Step 7; Implement the Worker Loop](#step-7--implement-the-worker-loop)
+13. [Step 8; Seed the Initial Content](#step-8--seed-the-initial-content)
+14. [Step 9; Run the Maintenance Agent](#step-9--run-the-maintenance-agent)
+15. [Step 10; Build the Query Interface](#step-10--build-the-query-interface)
 16. [Citation Rules](#16-citation-rules)
 17. [The Context Graph: Backlinks and Cross-References](#17-the-context-graph-backlinks-and-cross-references)
 18. [Source Reliability and Conflict Resolution](#18-source-reliability-and-conflict-resolution)
@@ -55,11 +55,11 @@ Before building anything, an LLM agent implementing this system must internalise
 
 ### 1.1 The Git Repo Is the Single Source of Truth
 
-Every piece of knowledge the ECL contains lives as a file in this repository. Every update, correction, addition, and deletion is a git commit. This is not a style preference — it is the architectural foundation that makes everything else possible:
+Every piece of knowledge the ECL contains lives as a file in this repository. Every update, correction, addition, and deletion is a git commit. This is not a style preference; it is the architectural foundation that makes everything else possible:
 
 - **Auditability:** `git log` gives a complete, timestamped history of how understanding evolved.
 - **Conflict resolution:** When two agents disagree about a fact, the commit history shows which version came from which source at which time.
-- **Multi-agent coordination:** Multiple workers writing simultaneously use git's push-rejection mechanism as a distributed mutex. The last clean push wins; others retry.
+- **Multi-agent coordination:** Multiple workers writing simultaneously use git's push-rejection mechanism as a distributed mutex. The last clean push wins;  others retry.
 - **Human legibility:** A human engineer can `git clone` the repo and read the entire company's institutional memory as Markdown files.
 
 There is no separate database. No vector store. No external state. If it is not in a committed file in this repo, it does not exist in the ECL.
@@ -92,7 +92,7 @@ If an agent cannot cite a claim, it must not make it. Unsourced assertions are m
 When two sources disagree, the ECL does not pick a side. It documents the conflict explicitly:
 
 ```markdown
-## Data Retention Policy — Conflict Note
+## Data Retention Policy; Conflict Note
 
 The legal team's policy document states customer data is deleted after 90 days of churn
 [[Legal Policy v2.3]](../legal/data-retention-policy.md).
@@ -110,19 +110,19 @@ A documented conflict is vastly more useful than a silently chosen winner, becau
 
 There are no ontology graphs, no semantic layers, no knowledge base schemas to maintain. The taxonomy is the folder structure. The context graph is the backlinks between files.
 
-When an agent discovers that "data retention questions" are connected to "GTM routing rules" and "security escalation policy", it writes a backlink in each relevant file pointing to the others. Over thousands of agent runs, these backlinks accumulate into a rich, navigable web of cross-domain understanding — built entirely from plain Markdown that any LLM can read and traverse.
+When an agent discovers that "data retention questions" are connected to "GTM routing rules" and "security escalation policy", it writes a backlink in each relevant file pointing to the others. Over thousands of agent runs, these backlinks accumulate into a rich, navigable web of cross-domain understanding; built entirely from plain Markdown that any LLM can read and traverse.
 
-### 1.5 Architecture Claims Are Durable; Status Claims Are Ephemeral
+### 1.5 Architecture Claims Are Durable;  Status Claims Are Ephemeral
 
 Different facts have different half-lives. The ECL must encode this explicitly:
 
 | Claim type | Example | Half-life | Agent behaviour |
 |------------|---------|-----------|-----------------|
-| Architecture | "We use an event-driven microservices architecture" | Years | Write with high confidence; rarely re-verify |
-| Process | "Incident severity is determined by the on-call lead" | Months | Write with medium confidence; schedule re-verification |
-| Status | "Feature X is in beta for EU customers" | Days–weeks | Write with explicit timestamp; flag for immediate staleness check |
-| People/roles | "Jane Smith owns the enterprise accounts" | Months | Write with person + date; flag for org-change triggers |
-| Pricing | "Enterprise tier starts at $50k" | Weeks–months | Write with date; link to source |
+| Architecture | "We use an event-driven microservices architecture" | Years | Write with high confidence;  rarely re-verify |
+| Process | "Incident severity is determined by the on-call lead" | Months | Write with medium confidence;  schedule re-verification |
+| Status | "Feature X is in beta for EU customers" | Days–weeks | Write with explicit timestamp;  flag for immediate staleness check |
+| People/roles | "Jane Smith owns the enterprise accounts" | Months | Write with person + date;  flag for org-change triggers |
+| Pricing | "Enterprise tier starts at $50k" | Weeks–months | Write with date;  link to source |
 
 Every ECL file should note the confidence level and last-verified date of its claims. The maintenance agent uses this to schedule re-verification tasks.
 
@@ -135,11 +135,11 @@ An ECL is the right tool when your organisation faces one or more of these condi
 - **Tribal knowledge problem:** Critical institutional knowledge lives in the heads of a few people and is lost when they leave.
 - **Source conflict problem:** Multiple systems (Confluence, Notion, Slack, email, code comments) describe the same process differently, and no one knows which is authoritative.
 - **Escalation routing problem:** Customer-facing and internal teams frequently give wrong answers because they cannot reliably distinguish "answer this" from "route this to an expert."
-- **Cross-domain gap problem:** Understanding a customer situation requires combining knowledge from product, legal, finance, and engineering — but these teams never produce a unified view.
+- **Cross-domain gap problem:** Understanding a customer situation requires combining knowledge from product, legal, finance, and engineering; but these teams never produce a unified view.
 - **Onboarding cost problem:** New employees take months to become productive because the knowledge they need is scattered across dozens of systems.
 - **AI agent grounding problem:** You are building LLM-powered agents but they hallucinate or give outdated answers because there is no reliable, structured knowledge base to ground them.
 
-The ECL is **not** the right tool as a replacement for a proper search engine over raw documents. Use a tool like Glean, Elastic, or a vector database for that. The ECL sits above retrieval — it is the synthesised, conflict-resolved, citations-verified layer that search cannot produce.
+The ECL is **not** the right tool as a replacement for a proper search engine over raw documents. Use a tool like Glean, Elastic, or a vector database for that. The ECL sits above retrieval; it is the synthesised, conflict-resolved, citations-verified layer that search cannot produce.
 
 ---
 
@@ -254,7 +254,7 @@ The ECL implementation is built on exactly two design patterns. Understanding bo
 
 ### 5.1 ECL Pattern (Andy Chen)
 
-The insight: synthesis and retrieval are different problems. Retrieval finds the best matching document. Synthesis builds a mental model — the reasoning framework an expert uses, not just the facts they cite.
+The insight: synthesis and retrieval are different problems. Retrieval finds the best matching document. Synthesis builds a mental model; the reasoning framework an expert uses, not just the facts they cite.
 
 The ECL encodes synthesis as Markdown files with inline citations in a Git repo. Every run by every agent appends to the repo's knowledge. Over thousands of agent runs, the repo accumulates:
 
@@ -288,7 +288,7 @@ This gives distributed mutual exclusion with no message broker, no database, no 
 
 ---
 
-## Step 1 — Discover Your Company's Knowledge Domains
+## Step 1; Discover Your Company's Knowledge Domains
 
 **Who does this:** An LLM agent with access to the company's documentation, org chart, and a human point of contact.
 
@@ -318,7 +318,7 @@ An agent should follow this process:
 
 3. **Ask: where does knowledge live that is currently lost or siloed?** Those gaps are high-priority domains.
 
-4. **Start with 5–8 domains.** More than 12 is usually a sign the domains are too granular. Merge related areas. The ECL grows domains over time — it is easier to split a large domain later than to maintain too many thin ones from the start.
+4. **Start with 5–8 domains.** More than 12 is usually a sign the domains are too granular. Merge related areas. The ECL grows domains over time; it is easier to split a large domain later than to maintain too many thin ones from the start.
 
 5. **Assign a domain owner** (a human) for each domain. They are the escalation point when an agent finds conflicting information or cannot verify a claim. Record this in `meta/domain-index.md`.
 
@@ -331,16 +331,16 @@ Create `meta/domain-index.md` with entries like:
 
 | Domain | Folder | Owner | Primary sources | Notes |
 |--------|--------|-------|----------------|-------|
-| Product | domains/product/ | @product-lead | Confluence, Jira, PRDs, release notes | Covers all product lines; separate sub-domains if >3 products |
+| Product | domains/product/ | @product-lead | Confluence, Jira, PRDs, release notes | Covers all product lines;  separate sub-domains if >3 products |
 | Engineering | domains/engineering/ | @engineering-lead | GitHub, runbooks, ADRs, on-call logs | Source code is ground truth for how things work |
 | GTM | domains/gtm/ | @sales-ops | Salesforce, Gong, Slack #sales, battle cards | High staleness risk on competitive claims |
 | Legal | domains/legal/ | @general-counsel | Legal docs, contracts, policy documents | Many topics are ROUTE-NOT-ANSWER |
-| People | domains/people/ | @hr-lead | HRIS, org chart, Slack #general | Roles change frequently; always include last-verified date |
+| People | domains/people/ | @hr-lead | HRIS, org chart, Slack #general | Roles change frequently;  always include last-verified date |
 ```
 
 ---
 
-## Step 2 — Map Your Data Sources
+## Step 2; Map Your Data Sources
 
 **Who does this:** An LLM agent with a human providing access credentials or API tokens.
 
@@ -348,7 +348,7 @@ Create `meta/domain-index.md` with entries like:
 
 ### Why source mapping matters
 
-The ECL's quality is entirely determined by the quality and coverage of its sources. An agent that cannot reach the primary source for a claim will either leave a gap or cite a secondary source — both are inferior. Source mapping ensures agents know exactly where to look for each type of information, what access they have, and what the limitations of each source are.
+The ECL's quality is entirely determined by the quality and coverage of its sources. An agent that cannot reach the primary source for a claim will either leave a gap or cite a secondary source; both are inferior. Source mapping ensures agents know exactly where to look for each type of information, what access they have, and what the limitations of each source are.
 
 ### Source categories
 
@@ -356,21 +356,21 @@ The ECL's quality is entirely determined by the quality and coverage of its sour
 
 | Source type | What it's best for | Typical access method | Staleness risk |
 |------------|-------------------|----------------------|---------------|
-| Source code / Git | How software actually behaves; feature flags; config | GitHub/GitLab API or local clone | Low — commits are authoritative |
+| Source code / Git | How software actually behaves;  feature flags;  config | GitHub/GitLab API or local clone | Low; commits are authoritative |
 | Production database schema | Data model ground truth | Read-only DB connection or ERD export | Low |
-| ERP / CRM (e.g. Salesforce) | Customer records, deal data, pipeline | API or export | Medium — data entry lag |
+| ERP / CRM (e.g. Salesforce) | Customer records, deal data, pipeline | API or export | Medium; data entry lag |
 | HRIS (e.g. Workday) | Org chart, headcount, roles | API or export | Medium |
-| Ticketing (e.g. Jira) | Bug status, feature status, sprint state | REST API | Low for status; medium for priority |
+| Ticketing (e.g. Jira) | Bug status, feature status, sprint state | REST API | Low for status;  medium for priority |
 | Billing system | Subscription, churn, revenue data | API or export | Low |
 
 #### Internal unstructured sources (high authority for process and culture)
 
 | Source type | What it's best for | Typical access method | Staleness risk |
 |------------|-------------------|----------------------|---------------|
-| Slack | Real process (vs. documented ideal); informal decisions; tribal knowledge | Slack API + search | High — messages age quickly |
-| Gong / call recordings | What customers actually ask; how reps actually answer; deal dynamics | Gong API | High — each call is a snapshot |
-| Email threads | Executive decisions; legal discussions; client commitments | Gmail/Outlook API | High |
-| Confluence / Notion | Process documentation; onboarding; policies | REST API | Medium — docs often lag reality |
+| Slack | Real process (vs. documented ideal);  informal decisions;  tribal knowledge | Slack API + search | High; messages age quickly |
+| Gong / call recordings | What customers actually ask;  how reps actually answer;  deal dynamics | Gong API | High; each call is a snapshot |
+| Email threads | Executive decisions;  legal discussions;  client commitments | Gmail/Outlook API | High |
+| Confluence / Notion | Process documentation;  onboarding;  policies | REST API | Medium; docs often lag reality |
 | Google Drive / SharePoint | Presentations, reports, OKRs, strategy docs | Drive API | Medium |
 
 #### External sources (authority for competitive and market context)
@@ -388,25 +388,25 @@ The ECL's quality is entirely determined by the quality and coverage of its sour
 For each domain defined in Step 1, document the sources in `meta/domain-index.md`:
 
 ```markdown
-## GTM Domain — Source Map
+## GTM Domain; Source Map
 
 ### Primary sources (highest authority)
-1. **Salesforce** — deal data, customer segments, churn records
+1. **Salesforce**; deal data, customer segments, churn records
    - Access: REST API via SALESFORCE_TOKEN env var
-   - Limitation: 24–48h data entry lag from reps; field definitions vary by team
+   - Limitation: 24–48h data entry lag from reps;  field definitions vary by team
 
-2. **Gong** — what customers actually ask and how reps answer
+2. **Gong**; what customers actually ask and how reps answer
    - Access: Gong API via GONG_API_KEY env var
-   - Limitation: only covers calls that were recorded; excludes email and chat
+   - Limitation: only covers calls that were recorded;  excludes email and chat
 
 ### Secondary sources
-3. **Slack #sales** — informal decisions, competitive intel, escalation patterns
+3. **Slack #sales**; informal decisions, competitive intel, escalation patterns
    - Access: Slack API via SLACK_BOT_TOKEN env var
-   - Limitation: ephemeral; context collapses without thread; high noise
+   - Limitation: ephemeral;  context collapses without thread;  high noise
 
-4. **Confluence /Sales Playbooks** — official process documentation
+4. **Confluence /Sales Playbooks**; official process documentation
    - Access: Confluence REST API
-   - Limitation: frequently out of date; treat as "ideal process", not "real process"
+   - Limitation: frequently out of date;  treat as "ideal process", not "real process"
 
 ### Source authority hierarchy (highest → lowest)
 1. Salesforce closed-won/lost data
@@ -418,7 +418,7 @@ For each domain defined in Step 1, document the sources in `meta/domain-index.md
 
 ---
 
-## Step 3 — Define Source Authority
+## Step 3; Define Source Authority
 
 **Who does this:** LLM agent, informed by a human domain expert for each domain.
 
@@ -437,49 +437,49 @@ Source code shows what the system *does*. A Confluence page shows what someone *
 A Jira ticket from last week describing a specific customer bug is more reliable than a two-year-old architecture document about how that area generally works.
 
 **Principle 3: Corroboration threshold.**
-Three independent sources agreeing on a claim crosses the threshold for high confidence. Five messages from the same Slack channel are one data point, not five — they share the same source bias.
+Three independent sources agreeing on a claim crosses the threshold for high confidence. Five messages from the same Slack channel are one data point, not five; they share the same source bias.
 
 **Principle 4: People signals have short half-lives.**
 A statement like "Jane owns enterprise accounts" may have been true six months ago. Any people/role claim must include a last-verified date. Do not trust people claims older than 90 days without re-verification.
 
 **Principle 5: Sensitive questions get documented, not answered.**
-Some questions should never be answered directly — they should be routed to an expert. Common examples: legal liability, data privacy timelines, security architecture details, pricing exceptions, executive commitments. The ECL's job for these is to document *why* they are sensitive and *who* to route them to, not to provide the answer.
+Some questions should never be answered directly; they should be routed to an expert. Common examples: legal liability, data privacy timelines, security architecture details, pricing exceptions, executive commitments. The ECL's job for these is to document *why* they are sensitive and *who* to route them to, not to provide the answer.
 
 ### Domain-specific authority tables
 
 For each domain, produce an explicit table. This becomes the agent's decision rule when sources conflict:
 
 ```markdown
-## Engineering Domain — Source Authority
+## Engineering Domain; Source Authority
 
 | Source | Authority level | Best used for | Do NOT use for |
 |--------|----------------|---------------|----------------|
-| Source code (main branch) | PRIMARY | How a feature actually behaves; configuration; limits | Future roadmap; customer-facing descriptions |
+| Source code (main branch) | PRIMARY | How a feature actually behaves;  configuration;  limits | Future roadmap;  customer-facing descriptions |
 | ADRs (Architecture Decision Records) | PRIMARY | Why a design choice was made | Current state if ADR is >1 year old without a revision |
-| On-call runbooks | HIGH | Incident triage; known failure modes | Normal operation flows |
+| On-call runbooks | HIGH | Incident triage;  known failure modes | Normal operation flows |
 | Jira tickets (last 6 months) | HIGH | Current bug/feature status | Historical context |
-| Engineering Confluence | MEDIUM | Intended design; onboarding context | Actual current behaviour |
-| Slack #engineering (last 90 days) | MEDIUM | Emerging issues; informal decisions | Formal commitments |
+| Engineering Confluence | MEDIUM | Intended design;  onboarding context | Actual current behaviour |
+| Slack #engineering (last 90 days) | MEDIUM | Emerging issues;  informal decisions | Formal commitments |
 | Slack #engineering (>90 days) | LOW | Historical context only | Anything current |
 | Blog posts / talks by engineers | LOW | General philosophy | Specific product behaviour |
 ```
 
 ---
 
-## Step 4 — Create the Meta Seed Files
+## Step 4; Create the Meta Seed Files
 
 **Who does this:** LLM agent.
 
 **When:** Before any domain content is written. These files are read by every subsequent agent on every run.
 
-The `meta/` directory is the ECL's self-guidance system. It does not contain company knowledge — it contains the rules and learned wisdom that agents use when building and maintaining company knowledge.
+The `meta/` directory is the ECL's self-guidance system. It does not contain company knowledge; it contains the rules and learned wisdom that agents use when building and maintaining company knowledge.
 
 ### 4.1 `meta/system-prompt.md`
 
 This file encodes the agent's identity, operating rules, and data model. Every worker agent reads this at the start of every run. It should be written specifically for your company but follow this template:
 
 ```markdown
-# ECL Agent — System Prompt
+# ECL Agent; System Prompt
 
 ## Identity
 
@@ -535,7 +535,7 @@ The initial seed content should be exactly this and nothing more:
 > This is a living document. Agents: every time you learn something about
 > which sources are reliable, stale, or conflicting, add it here.
 > Each entry should cite the specific experience that produced the insight.
-> This file has no top-down author — it is built entirely bottom-up from
+> This file has no top-down author; it is built entirely bottom-up from
 > accumulated agent experience.
 
 ## Source reliability observations
@@ -562,7 +562,7 @@ The initial seed content should be exactly this and nothing more:
 
 ## Tool usage notes
 
-<!-- How to use each tool effectively; known limitations; gotchas. -->
+<!-- How to use each tool effectively;  known limitations;  gotchas. -->
 ```
 
 Over time, as agents run, they will fill this file with observations like: *"Confluence pages in the /sales-playbooks/ section are typically 6–9 months stale. Verify against recent Gong calls before citing."* These observations make every subsequent agent smarter without any changes to the code or prompt.
@@ -573,7 +573,7 @@ The completed domain index from Step 1. Used by agents to understand the full sc
 
 ---
 
-## Step 5 — Write the System Prompt
+## Step 5; Write the System Prompt
 
 **Who does this:** LLM agent in collaboration with a human reviewer.
 
@@ -602,7 +602,7 @@ The system prompt in `meta/system-prompt.md` controls agent behaviour across eve
 
 ---
 
-## Step 6 — Build the Task System
+## Step 6; Build the Task System
 
 **Who does this:** Engineer or LLM agent writing the runner script.
 
@@ -632,22 +632,22 @@ metadata:
 
 | Kind | Description | When to create |
 |------|-------------|----------------|
-| `synthesise` | Write or update an ECL topic file from sources | New topic; source has changed; file is missing |
-| `verify` | Re-check all claims in an existing file against current sources | File is stale; source has been updated |
-| `backlink` | Scan all domain files and add cross-domain references | Periodically; after major new content added |
-| `drift` | Compare current sources against last-synthesised snapshot | Scheduled; after a known system change |
-| `dedupe` | Identify duplicate or near-duplicate content across domains | Periodically; after large content additions |
-| `docs` | AI review of mapping-notes to identify gaps and contradictions | Periodically; on request |
+| `synthesise` | Write or update an ECL topic file from sources | New topic;  source has changed;  file is missing |
+| `verify` | Re-check all claims in an existing file against current sources | File is stale;  source has been updated |
+| `backlink` | Scan all domain files and add cross-domain references | Periodically;  after major new content added |
+| `drift` | Compare current sources against last-synthesised snapshot | Scheduled;  after a known system change |
+| `dedupe` | Identify duplicate or near-duplicate content across domains | Periodically;  after large content additions |
+| `docs` | AI review of mapping-notes to identify gaps and contradictions | Periodically;  on request |
 | `conflict-review` | Investigate a documented conflict and produce a resolution proposal | When a conflict note has been unresolved >30 days |
 
 ### Priority levels
 
 | Priority | Meaning |
 |----------|---------|
-| 1 | Drift detected — immediate re-verification needed |
+| 1 | Drift detected; immediate re-verification needed |
 | 2 | Topic file missing entirely |
 | 3 | Proof/verification file missing |
-| 4 | Stale content (>7 days for status claims; >30 days for process claims) |
+| 4 | Stale content (>7 days for status claims;  >30 days for process claims) |
 | 5 | Default / routine |
 | 6 | Low-priority enrichment (backlinks, deduplication) |
 | 7 | Scheduled maintenance (docs review, cross-domain scan) |
@@ -665,17 +665,17 @@ def claim_task(repo):
        a. If .LOCKED exists and is fresh (< LOCK_TTL): skip
        b. If .LOCKED exists and is stale (>= LOCK_TTL): reclaim (log warning)
        c. Write .LOCKED with {agent: AGENT_ID, locked_at: timestamp}
-       d. Push to git — if push succeeds: this agent owns the task
+       d. Push to git; if push succeeds: this agent owns the task
           If push fails (race condition): delete local .LOCKED, try next task
     4. Return claimed task, or None if queue is empty
     """
 ```
 
-The push is the atomic compare-and-swap. Git's remote will reject any push that is not a fast-forward — meaning if two agents try to claim the same task simultaneously, only one push succeeds. The other sees a `GitCommandError` and moves on to the next candidate.
+The push is the atomic compare-and-swap. Git's remote will reject any push that is not a fast-forward; meaning if two agents try to claim the same task simultaneously, only one push succeeds. The other sees a `GitCommandError` and moves on to the next candidate.
 
 ---
 
-## Step 7 — Implement the Worker Loop
+## Step 7; Implement the Worker Loop
 
 **Who does this:** Engineer writing the runner script.
 
@@ -687,7 +687,7 @@ The worker loop is the core execution engine. It is intentionally simple:
 LOOP:
   1. Pull latest ECL from git
   2. Claim a task (using the locking protocol in Step 6)
-  3. If no task: sleep with exponential backoff; continue
+  3. If no task: sleep with exponential backoff;  continue
   4. Execute the task
   5. Release the task (delete yaml + lock, commit, push)
   6. Sleep 2 seconds (rate limiting)
@@ -747,20 +747,20 @@ Every task execution is wrapped in a try/except. On failure:
 
 1. Log the full traceback to `logs/ERROR-{domain}-{kind}-{timestamp}.md`
 2. Commit the error log
-3. Call `release_task(task, success=False)` — the task YAML is deleted but the commit message is `task/failed:` rather than `task/done:`
-4. Continue the loop — do not crash the worker
+3. Call `release_task(task, success=False)`; the task YAML is deleted but the commit message is `task/failed:` rather than `task/done:`
+4. Continue the loop; do not crash the worker
 
 This prevents a single malformed source file from killing the entire worker fleet.
 
 ---
 
-## Step 8 — Seed the Initial Content
+## Step 8; Seed the Initial Content
 
 **Who does this:** LLM agent, running as a `seed` command before the worker loop starts.
 
 **When:** Once, during ECL initialisation.
 
-Seeding does not write domain knowledge — that is the worker loop's job. Seeding copies existing artefacts into the repo structure so the workers have a starting point.
+Seeding does not write domain knowledge; that is the worker loop's job. Seeding copies existing artefacts into the repo structure so the workers have a starting point.
 
 ### What to seed
 
@@ -780,11 +780,11 @@ Seeding does not write domain knowledge — that is the worker loop's job. Seedi
 feat(seed): import {N} files from {source_description}
 ```
 
-The seed commit establishes the baseline for drift detection — subsequent runs compare against it.
+The seed commit establishes the baseline for drift detection; subsequent runs compare against it.
 
 ---
 
-## Step 9 — Run the Maintenance Agent
+## Step 9; Run the Maintenance Agent
 
 **Who does this:** A dedicated agent process running on a schedule (e.g., every 6 hours).
 
@@ -803,7 +803,7 @@ For each domain:
      > staleness threshold → create verify task (priority 4)
 
   3. Are there any topic files with last_verified older than their staleness SLA?
-     (Status claims: 7 days; Process claims: 30 days; Architecture claims: 90 days)
+     (Status claims: 7 days;  Process claims: 30 days;  Architecture claims: 90 days)
      YES → create verify task for each stale file (priority 4)
 
   4. Are there any conflict notes unresolved for >30 days?
@@ -829,18 +829,18 @@ Different claims need different maintenance intervals. Configure these for your 
 
 | Claim type | Default SLA | Reasoning |
 |------------|------------|-----------|
-| Pricing | 7 days | Changes frequently; expensive to get wrong |
+| Pricing | 7 days | Changes frequently;  expensive to get wrong |
 | Product status (beta/GA/deprecated) | 7 days | Changes with each sprint |
 | People / roles | 30 days | Org changes happen monthly |
 | Process documentation | 30 days | Process evolves but not daily |
-| Technical architecture | 90 days | Evolves slowly; refactors take time |
+| Technical architecture | 90 days | Evolves slowly;  refactors take time |
 | Competitive landscape | 14 days | Competitors ship fast |
 | Regulatory / compliance | 30 days | Regulations change slowly but consequences are high |
 | Historical analysis | Never | Past events don't change |
 
 ---
 
-## Step 10 — Build the Query Interface
+## Step 10; Build the Query Interface
 
 **Who does this:** Engineer, after the ECL has initial content.
 
@@ -848,7 +848,7 @@ Different claims need different maintenance intervals. Configure these for your 
 
 The ECL is optimised for *contribution* by agents. The query interface is what makes it useful for *consumption* by humans and downstream AI agents.
 
-### Option A — Claude Code (simplest, recommended for getting started)
+### Option A; Claude Code (simplest, recommended for getting started)
 
 Simply give Claude Code access to the ECL repository. Its tool calls will navigate the folder structure, read relevant files, and compose answers grounded in the ECL content. This requires no additional infrastructure.
 
@@ -861,7 +861,7 @@ If the ECL documents a conflict on this topic, present both sides.
 If the ECL says to route this question, tell the user who to route to and why.
 ```
 
-### Option B — Direct API query agent
+### Option B; Direct API query agent
 
 A lightweight Python script that:
 1. Takes a question as input
@@ -869,9 +869,9 @@ A lightweight Python script that:
 3. Sends the relevant passages + question to the LLM
 4. Returns the answer with ECL file citations
 
-This is sufficient for most use cases and requires no vector database — simple `grep` or `ripgrep` over the Markdown files is fast enough for ECL repositories up to ~10,000 files.
+This is sufficient for most use cases and requires no vector database; simple `grep` or `ripgrep` over the Markdown files is fast enough for ECL repositories up to ~10,000 files.
 
-### Option C — Full RAG pipeline
+### Option C; Full RAG pipeline
 
 For large ECLs (>10,000 files) or high query volume, build a proper retrieval pipeline:
 1. Embed all ECL files (chunk by section, not by arbitrary token count)
@@ -894,7 +894,7 @@ Regardless of option chosen, the query interface must:
 
 ## 16. Citation Rules
 
-Citations are the single most important quality control mechanism in the ECL. An agent writing without citations is worse than no agent at all — it produces confident-sounding content with no traceability, which is harder to challenge and correct than a blank file.
+Citations are the single most important quality control mechanism in the ECL. An agent writing without citations is worse than no agent at all; it produces confident-sounding content with no traceability, which is harder to challenge and correct than a blank file.
 
 ### Mandatory citation format
 
@@ -939,10 +939,10 @@ with EMEA deals typically discounted 15–20%
 For high-confidence claims (used in customer-facing scenarios, legal contexts, or security contexts), require three independent sources. Note the corroboration in the ECL file:
 
 ```markdown
-> **Confidence: HIGH** — corroborated by three independent sources:
-> 1. [[Source A]](path) — description
-> 2. [[Source B]](path) — description
-> 3. [[Source C]](path) — description
+> **Confidence: HIGH**; corroborated by three independent sources:
+> 1. [[Source A]](path); description
+> 2. [[Source B]](path); description
+> 3. [[Source C]](path); description
 ```
 
 ---
@@ -980,7 +980,7 @@ An agent should add a backlink whenever it encounters:
 
 The backlink agent (`kind: backlink`) runs periodically. It reads summaries of all domain files and asks: *"What connections exist that are not yet captured as backlinks?"* It produces a report listing suggested backlinks and optionally writes them to the relevant files.
 
-This is what produces the ECL's emergent meta-awareness: over many backlink scans, the repo builds a rich web of cross-domain context that mirrors how the company actually functions — with all its informal dependencies, shared concerns, and inter-team politics encoded in plain text.
+This is what produces the ECL's emergent meta-awareness: over many backlink scans, the repo builds a rich web of cross-domain context that mirrors how the company actually functions; with all its informal dependencies, shared concerns, and inter-team politics encoded in plain text.
 
 ---
 
@@ -1002,17 +1002,17 @@ When a conflict is found between sources:
 
 | Severity | Definition | Action |
 |----------|-----------|--------|
-| Critical | Conflict creates legal, security, or financial risk | Create priority-1 task; flag domain owner immediately |
-| High | Conflict affects customer-facing answers | Create priority-2 task; add routing rule |
+| Critical | Conflict creates legal, security, or financial risk | Create priority-1 task;  flag domain owner immediately |
+| High | Conflict affects customer-facing answers | Create priority-2 task;  add routing rule |
 | Medium | Conflict affects internal process | Create priority-4 task |
-| Low | Minor inconsistency with no immediate impact | Log in mapping-notes; create priority-6 task |
+| Low | Minor inconsistency with no immediate impact | Log in mapping-notes;  create priority-6 task |
 
 **Step 3: Escalate to domain owner if unresolved after threshold.** For Critical and High severity: 24 hours. For Medium: 14 days. For Low: 30 days. Create a `conflict-review` task automatically.
 
-**Step 4: When resolved, update with resolution and close the conflict note.** Do not delete the original conflict text — mark it resolved with the resolution and the date:
+**Step 4: When resolved, update with resolution and close the conflict note.** Do not delete the original conflict text; mark it resolved with the resolution and the date:
 
 ```markdown
-> ~~**CONFLICT (found 2026-03-01):** Policy doc says 90 days; runbook says 120 days.~~
+> ~~**CONFLICT (found 2026-03-01):** Policy doc says 90 days;  runbook says 120 days.~~
 > **RESOLVED 2026-03-15 by @general-counsel:** Confirmed 90 days is correct.
 > The runbook was not updated after the policy change in Q4 2025.
 > Runbook update ticket: [[INFRA-4892]](../sources/jira/INFRA-4892.md).
@@ -1028,10 +1028,10 @@ The ECL architecture scales horizontally with no changes to the core design. Mor
 
 | ECL phase | Recommended workers | Rationale |
 |-----------|--------------------|-|
-| Initial seeding | 1 | Keep git history clean; easy to debug |
+| Initial seeding | 1 | Keep git history clean;  easy to debug |
 | First population (domains 1–3) | 3–5 | Enough to parallelise without overloading sources |
-| Full population (all domains) | 10–20 | Matches Andy Chen's production setup; saturates task queue efficiently |
-| Maintenance mode | 2–5 | Most tasks are verify/backlink; lower parallelism needed |
+| Full population (all domains) | 10–20 | Matches Andy Chen's production setup;  saturates task queue efficiently |
+| Maintenance mode | 2–5 | Most tasks are verify/backlink;  lower parallelism needed |
 
 ### Token cost management
 
@@ -1051,7 +1051,7 @@ The ECL runner can be executed in any environment that has git access. Common ap
 
 ```bash
 # Local: run N workers in parallel
-for i in $(seq 1 5); do
+for i in $(seq 1 5);  do
   uv run ecl-runner.py worker --source-dir ./sources &
 done
 
@@ -1071,7 +1071,7 @@ The ECL is built by machines but its accuracy depends on periodic human review, 
 ### When humans should review
 
 - **Before any customer-facing deployment.** The ECL may be accurate for internal use but contain nuances inappropriate for direct customer answers.
-- **After detecting a conflict involving a sensitive topic.** An agent that documents a conflict is correct to document it — but a human should verify the resolution.
+- **After detecting a conflict involving a sensitive topic.** An agent that documents a conflict is correct to document it; but a human should verify the resolution.
 - **For people and org-related content.** Agents can misread org signals. Role changes, reporting structures, and informal authority are better verified by HR or management.
 - **For legal, security, and compliance content.** Agents write what the sources say. Whether that interpretation is legally correct requires expert judgment.
 - **Periodically for the highest-traffic topics.** Whatever topics are queried most often should receive regular human spot-checks.
@@ -1147,7 +1147,7 @@ def run_drift_check(domain):
     # Read the domain's last_synthesised_at from mapping-notes.md
     # For each source file referenced in the domain's topic files:
     #   Check if the source file has changed since last_synthesised_at
-    #   If yes: log as potential drift; create verify task
+    #   If yes: log as potential drift;  create verify task
     # Generate a drift report in logs/drift-YYYY-MM-DD.md
 ```
 
@@ -1156,11 +1156,11 @@ For structured sources (databases, APIs), drift detection checks whether the dat
 ### Drift severity
 
 ```markdown
-🔴 Critical drift  — Conflict with a live customer commitment or legal obligation
-🟠 High drift      — Feature status, pricing, or routing rule is outdated
-🟡 Medium drift    — Process documentation lags new practice
-🟢 Low drift       — Minor update; content still broadly accurate
-⚪ No drift        — Content matches current sources
+🔴 Critical drift ; Conflict with a live customer commitment or legal obligation
+🟠 High drift     ; Feature status, pricing, or routing rule is outdated
+🟡 Medium drift   ; Process documentation lags new practice
+🟢 Low drift      ; Minor update;  content still broadly accurate
+⚪ No drift       ; Content matches current sources
 ```
 
 ---
@@ -1182,13 +1182,13 @@ The steps above describe a generic ECL. Every company needs to adapt the followi
 
 | Element | How to customise |
 |---------|-----------------|
-| Domain names and structure | Step 1 — discover from org chart and common questions |
-| Source systems | Step 2 — map to your actual tooling (not every company has Gong) |
-| Source authority table | Step 3 — must reflect your specific sources and their reliability |
-| Staleness SLAs | Step 9 — adjust to your industry's pace of change |
-| Sensitivity tiers | Step 21 — adjust to your compliance requirements |
+| Domain names and structure | Step 1; discover from org chart and common questions |
+| Source systems | Step 2; map to your actual tooling (not every company has Gong) |
+| Source authority table | Step 3; must reflect your specific sources and their reliability |
+| Staleness SLAs | Step 9; adjust to your industry's pace of change |
+| Sensitivity tiers | Step 21; adjust to your compliance requirements |
 | Agent tools | Match to your available integrations (Slack API, Jira API, GitHub API, etc.) |
-| Routing rules | Highly company-specific — what is sensitive varies enormously |
+| Routing rules | Highly company-specific; what is sensitive varies enormously |
 
 ### Questions to ask a human before building
 
@@ -1216,13 +1216,13 @@ Understanding what the ECL is not prevents a common class of implementation erro
 
 **The ECL is not a document store.** Raw source documents live in `sources/` as read-only snapshots. The ECL's domain files are syntheses of those sources, not the sources themselves. If someone asks "can you find the Q3 board presentation", they want a search tool, not the ECL.
 
-**The ECL is not a search engine.** If someone asks "show me all Jira tickets from last week", they want Jira, not the ECL. The ECL synthesises conclusions from sources; it does not index or search raw source content.
+**The ECL is not a search engine.** If someone asks "show me all Jira tickets from last week", they want Jira, not the ECL. The ECL synthesises conclusions from sources;  it does not index or search raw source content.
 
 **The ECL is not a real-time system.** ECL content has a staleness SLA measured in days, not seconds. For real-time operational data (current system status, live deal pipeline, active incident), query the source system directly.
 
-**The ECL is not a policy enforcement system.** The ECL documents policies and routing rules. It does not enforce them. An ECL that says "route data deletion questions to the security team" is a guide for agents and humans — it does not technically prevent anyone from answering the question incorrectly.
+**The ECL is not a policy enforcement system.** The ECL documents policies and routing rules. It does not enforce them. An ECL that says "route data deletion questions to the security team" is a guide for agents and humans; it does not technically prevent anyone from answering the question incorrectly.
 
-**The ECL is not finished.** It is never finished. Companies change. Knowledge changes. The ECL's value compounds over time as the agent fleet runs more cycles, finds more conflicts, builds more backlinks, and accumulates more reliability wisdom in `how-to-get-accurate-information.md`. The target state is not "ECL is complete" — it is "ECL is continuously maintained."
+**The ECL is not finished.** It is never finished. Companies change. Knowledge changes. The ECL's value compounds over time as the agent fleet runs more cycles, finds more conflicts, builds more backlinks, and accumulates more reliability wisdom in `how-to-get-accurate-information.md`. The target state is not "ECL is complete"; it is "ECL is continuously maintained."
 
 ---
 
@@ -1230,27 +1230,27 @@ Understanding what the ECL is not prevents a common class of implementation erro
 
 | Term | Definition |
 |------|-----------|
-| **ECL** | Enterprise Context Layer — the git repo that encodes how the company actually works |
-| **Domain** | A coherent area of company knowledge with clear ownership; maps to one `domains/` subfolder |
-| **Synthesis** | The act of reading multiple sources and writing a cited, conflict-aware summary — the core operation of the ECL |
-| **Retrieval** | Finding the best matching document for a query; this is what search engines do; the ECL is not retrieval |
+| **ECL** | Enterprise Context Layer; the git repo that encodes how the company actually works |
+| **Domain** | A coherent area of company knowledge with clear ownership;  maps to one `domains/` subfolder |
+| **Synthesis** | The act of reading multiple sources and writing a cited, conflict-aware summary; the core operation of the ECL |
+| **Retrieval** | Finding the best matching document for a query;  this is what search engines do;  the ECL is not retrieval |
 | **Inline citation** | A Markdown link within a claim that traces it to a primary source: `[[desc]](path)` |
 | **Conflict note** | An ECL entry documenting that two sources disagree, naming both, and identifying who should resolve it |
-| **Routing note** | An ECL entry that says "do not answer this directly; route to X because Y" |
+| **Routing note** | An ECL entry that says "do not answer this directly;  route to X because Y" |
 | **Mapping notes** | The per-domain log appended after every agent run: timestamps, sources, claims written, conflicts found |
-| **Backlink** | A Markdown cross-reference from one domain file to a related file in another domain; collectively forms the context graph |
-| **Context graph** | The web of backlinks across all ECL files; the ECL's equivalent of a knowledge graph, implemented in plain text |
-| **C-Compiler pattern** | Anthropic's file-based distributed locking mechanism: tasks are YAML files; claiming a task means writing a `.LOCKED` sidecar and pushing to git |
+| **Backlink** | A Markdown cross-reference from one domain file to a related file in another domain;  collectively forms the context graph |
+| **Context graph** | The web of backlinks across all ECL files;  the ECL's equivalent of a knowledge graph, implemented in plain text |
+| **C-Compiler pattern** | Anthropic's file-based distributed locking mechanism: tasks are YAML files;  claiming a task means writing a `.LOCKED` sidecar and pushing to git |
 | **Task** | A YAML file in `tasks/` representing one unit of work for a worker agent |
 | **Worker agent** | An LLM agent running the claim → execute → release loop |
 | **Maintenance agent** | A separate agent that scans the ECL for staleness, gaps, and conflicts, and creates tasks for workers to fix them |
-| **Staleness SLA** | The maximum age of an ECL claim before it should be re-verified; varies by claim type |
-| **Drift** | The ECL was correct when written but the world has changed; different from a conflict |
-| **Tribal knowledge** | Institutional memory held by individuals; not written down; the ECL's most valuable and most difficult target |
-| **`how-to-get-accurate-information.md`** | The key meta seed file; starts empty; agents fill it with source-reliability observations from real experience |
-| **Source authority** | The hierarchy determining which source wins when sources conflict; defined per domain in Step 3 |
+| **Staleness SLA** | The maximum age of an ECL claim before it should be re-verified;  varies by claim type |
+| **Drift** | The ECL was correct when written but the world has changed;  different from a conflict |
+| **Tribal knowledge** | Institutional memory held by individuals;  not written down;  the ECL's most valuable and most difficult target |
+| **`how-to-get-accurate-information.md`** | The key meta seed file;  starts empty;  agents fill it with source-reliability observations from real experience |
+| **Source authority** | The hierarchy determining which source wins when sources conflict;  defined per domain in Step 3 |
 | **Three-source corroboration** | The threshold for high-confidence claims: three independent sources must agree |
-| **Lock TTL** | The time after which a `.LOCKED` file is considered stale and can be reclaimed; default 10 minutes |
+| **Lock TTL** | The time after which a `.LOCKED` file is considered stale and can be reclaimed;  default 10 minutes |
 
 ---
 
@@ -1258,17 +1258,17 @@ Understanding what the ECL is not prevents a common class of implementation erro
 
 An LLM agent starting a new ECL from scratch should complete these steps in order:
 
-- [ ] **Step 1:** Interview a human; identify 5–8 knowledge domains; write `meta/domain-index.md`
-- [ ] **Step 2:** Map data sources for each domain; document access methods and limitations
-- [ ] **Step 3:** Write source authority tables; define the conflict resolution hierarchy
+- [ ] **Step 1:** Interview a human;  identify 5–8 knowledge domains;  write `meta/domain-index.md`
+- [ ] **Step 2:** Map data sources for each domain;  document access methods and limitations
+- [ ] **Step 3:** Write source authority tables;  define the conflict resolution hierarchy
 - [ ] **Step 4:** Create `meta/system-prompt.md` (complete), `meta/how-to-get-accurate-information.md` (empty template only)
 - [ ] **Step 5:** Human review of system prompt
 - [ ] **Step 6:** Implement task system (YAML schema, locking protocol, priority levels)
 - [ ] **Step 7:** Implement worker loop (pull → claim → execute → release → sleep)
-- [ ] **Step 8:** Seed existing docs; create domain READMEs; export source snapshots
-- [ ] **Step 9:** Start maintenance agent; define staleness SLAs
-- [ ] **Step 10:** Build query interface (start with Claude Code; migrate later if needed)
-- [ ] **Ongoing:** Monitor `logs/` for errors and drift reports; review domain owner escalations; let `how-to-get-accurate-information.md` grow
+- [ ] **Step 8:** Seed existing docs;  create domain READMEs;  export source snapshots
+- [ ] **Step 9:** Start maintenance agent;  define staleness SLAs
+- [ ] **Step 10:** Build query interface (start with Claude Code;  migrate later if needed)
+- [ ] **Ongoing:** Monitor `logs/` for errors and drift reports;  review domain owner escalations;  let `how-to-get-accurate-information.md` grow
 
 ---
 
