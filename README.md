@@ -9,7 +9,7 @@
 
 The Enterprise Context Layer is not a database. It is not a search engine. It is not a chatbot.
 
-It is a **living, self-maintaining Git repository** that encodes how your company actually works — the institutional memory, judgment calls, org behaviour, process reality, and cross-domain relationships that no retrieval system can derive on its own.
+It is a **living, self-maintaining Git repository** that encodes how your company actually works; the institutional memory, judgment calls, org behaviour, process reality, and cross-domain relationships that no retrieval system can derive on its own.
 
 Traditional RAG (Retrieval-Augmented Generation) fetches documents. The ECL synthesises understanding. When a sales rep asks "how long do we keep customer data after churn?", a retrieval system returns the closest policy document. The ECL returns: *"Don't answer this yourself; route to the security team. Here is why, with three cited incidents where reps got this wrong."*
 
@@ -21,7 +21,7 @@ The difference is synthesis over retrieval. The ECL contains the reasoning frame
 
 ## ⚡ Superpowers Integration
 
-This implementation adds [Superpowers](https://github.com/obra/superpowers) — an agentic skills framework — as a first-class component of the ECL architecture. Superpowers gives structure and discipline to the agents that *build* the ECL, the agents that *query* it, and the developers who *maintain* the tooling itself.
+This implementation adds [Superpowers](https://github.com/obra/superpowers);  an agentic skills framework;  as a first-class component of the ECL architecture. Superpowers gives structure and discipline to the agents that *build* the ECL, the agents that *query* it, and the developers who *maintain* the tooling itself.
 
 The two systems are complementary at every layer:
 
@@ -34,9 +34,9 @@ The two systems are complementary at every layer:
 
 There are three distinct integration points, described fully in [Section 11 (Superpowers Integration)](#11-superpowers-integration):
 
-1. **ECL as grounding for Superpowers agents** — before a Superpowers agent brainstorms or writes a plan, it reads the ECL to anchor its design in real architectural decisions, existing patterns, and team conventions.
-2. **Skills as ECL domain content** — team workflows, engineering conventions, and operating procedures are stored as Superpowers-compatible `SKILL.md` files inside the ECL's `domains/` tree, making process a first-class, maintained, citable artifact.
-3. **Superpowers as the build methodology for ECL tooling** — when implementing or extending the runner, worker loop, or query interface, use Superpowers' brainstorm → plan → subagent-TDD → code-review workflow.
+1. **ECL as grounding for Superpowers agents**;  before a Superpowers agent brainstorms or writes a plan, it reads the ECL to anchor its design in real architectural decisions, existing patterns, and team conventions.
+2. **Skills as ECL domain content**;  team workflows, engineering conventions, and operating procedures are stored as Superpowers-compatible `SKILL.md` files inside the ECL's `domains/` tree, making process a first-class, maintained, citable artifact.
+3. **Superpowers as the build methodology for ECL tooling**;  when implementing or extending the runner, worker loop, or query interface, use Superpowers' brainstorm → plan → subagent-TDD → code-review workflow.
 
 ---
 
@@ -47,17 +47,17 @@ There are three distinct integration points, described fully in [Section 11 (Sup
 3. [Architecture Overview](#3-architecture-overview)
 4. [Repository Structure](#4-repository-structure)
 5. [The Three Foundational Patterns](#5-the-three-foundational-patterns)
-6. [Step 1 — Discover Your Company's Knowledge Domains](#step-1--discover-your-companys-knowledge-domains)
-7. [Step 2 — Map Your Data Sources](#step-2--map-your-data-sources)
-8. [Step 3 — Define Source Authority](#step-3--define-source-authority)
-9. [Step 4 — Create the Meta Seed Files](#step-4--create-the-meta-seed-files)
-10. [Step 5 — Write the System Prompt](#step-5--write-the-system-prompt)
+6. [Step 1;  Discover Your Company's Knowledge Domains](#step-1--discover-your-companys-knowledge-domains)
+7. [Step 2;  Map Your Data Sources](#step-2--map-your-data-sources)
+8. [Step 3;  Define Source Authority](#step-3--define-source-authority)
+9. [Step 4;  Create the Meta Seed Files](#step-4--create-the-meta-seed-files)
+10. [Step 5;  Write the System Prompt](#step-5--write-the-system-prompt)
 11. [Superpowers Integration](#11-superpowers-integration)
-12. [Step 6 — Build the Task System](#step-6--build-the-task-system)
-13. [Step 7 — Implement the Worker Loop](#step-7--implement-the-worker-loop)
-14. [Step 8 — Seed the Initial Content](#step-8--seed-the-initial-content)
-15. [Step 9 — Run the Maintenance Agent](#step-9--run-the-maintenance-agent)
-16. [Step 10 — Build the Query Interface](#step-10--build-the-query-interface)
+12. [Step 6;  Build the Task System](#step-6--build-the-task-system)
+13. [Step 7;  Implement the Worker Loop](#step-7--implement-the-worker-loop)
+14. [Step 8;  Seed the Initial Content](#step-8--seed-the-initial-content)
+15. [Step 9;  Run the Maintenance Agent](#step-9--run-the-maintenance-agent)
+16. [Step 10;  Build the Query Interface](#step-10--build-the-query-interface)
 17. [Citation Rules](#17-citation-rules)
 18. [The Context Graph: Backlinks and Cross-References](#18-the-context-graph-backlinks-and-cross-references)
 19. [Source Reliability and Conflict Resolution](#19-source-reliability-and-conflict-resolution)
@@ -117,7 +117,7 @@ If an agent cannot cite a claim, it must not make it. Unsourced assertions are m
 When two sources disagree, the ECL does not pick a side. It documents the conflict explicitly:
 
 ```
-## Data Retention Policy — Conflict Note
+## Data Retention Policy;  Conflict Note
 
 The legal team's policy document states customer data is deleted after 90 days of churn
 [[Legal Policy v2.3]](../legal/data-retention-policy.md).
@@ -135,7 +135,7 @@ A documented conflict is vastly more useful than a silently chosen winner, becau
 
 There are no ontology graphs, no semantic layers, no knowledge base schemas to maintain. The taxonomy is the folder structure. The context graph is the backlinks between files.
 
-When an agent discovers that "data retention questions" are connected to "GTM routing rules" and "security escalation policy", it writes a backlink in each relevant file pointing to the others. Over thousands of agent runs, these backlinks accumulate into a rich, navigable web of cross-domain understanding — built entirely from plain Markdown that any LLM can read and traverse.
+When an agent discovers that "data retention questions" are connected to "GTM routing rules" and "security escalation policy", it writes a backlink in each relevant file pointing to the others. Over thousands of agent runs, these backlinks accumulate into a rich, navigable web of cross-domain understanding;  built entirely from plain Markdown that any LLM can read and traverse.
 
 ### 1.5 Architecture Claims Are Durable; Status Claims Are Ephemeral
 
@@ -160,11 +160,11 @@ An ECL is the right tool when your organisation faces one or more of these condi
 - **Tribal knowledge problem:** Critical institutional knowledge lives in the heads of a few people and is lost when they leave.
 - **Source conflict problem:** Multiple systems (Confluence, Notion, Slack, email, code comments) describe the same process differently, and no one knows which is authoritative.
 - **Escalation routing problem:** Customer-facing and internal teams frequently give wrong answers because they cannot reliably distinguish "answer this" from "route this to an expert."
-- **Cross-domain gap problem:** Understanding a customer situation requires combining knowledge from product, legal, finance, and engineering — but these teams never produce a unified view.
+- **Cross-domain gap problem:** Understanding a customer situation requires combining knowledge from product, legal, finance, and engineering;  but these teams never produce a unified view.
 - **Onboarding cost problem:** New employees take months to become productive because the knowledge they need is scattered across dozens of systems.
 - **AI agent grounding problem:** You are building LLM-powered agents but they hallucinate or give outdated answers because there is no reliable, structured knowledge base to ground them.
 
-The ECL is **not** the right tool as a replacement for a proper search engine over raw documents. Use a tool like Glean, Elastic, or a vector database for that. The ECL sits above retrieval — it is the synthesised, conflict-resolved, citations-verified layer that search cannot produce.
+The ECL is **not** the right tool as a replacement for a proper search engine over raw documents. Use a tool like Glean, Elastic, or a vector database for that. The ECL sits above retrieval;  it is the synthesised, conflict-resolved, citations-verified layer that search cannot produce.
 
 ---
 
@@ -289,7 +289,7 @@ The ECL implementation is built on three design patterns. Understanding all thre
 
 ### 5.1 ECL Pattern (Andy Chen)
 
-The insight: synthesis and retrieval are different problems. Retrieval finds the best matching document. Synthesis builds a mental model — the reasoning framework an expert uses, not just the facts they cite.
+The insight: synthesis and retrieval are different problems. Retrieval finds the best matching document. Synthesis builds a mental model;  the reasoning framework an expert uses, not just the facts they cite.
 
 The ECL encodes synthesis as Markdown files with inline citations in a Git repo. Every run by every agent appends to the repo's knowledge. Over thousands of agent runs, the repo accumulates:
 
@@ -334,11 +334,11 @@ Applied to the ECL:
 
 Skills are **mandatory workflows, not suggestions**. The agent checks for a relevant skill before any non-trivial action.
 
-The ECL also *stores* skills as domain content, making team processes first-class, maintained, citable artifacts in the knowledge layer — not buried in wikis.
+The ECL also *stores* skills as domain content, making team processes first-class, maintained, citable artifacts in the knowledge layer;  not buried in wikis.
 
 ---
 
-## Step 1 — Discover Your Company's Knowledge Domains
+## Step 1;  Discover Your Company's Knowledge Domains
 
 **Who does this:** An LLM agent with access to the company's documentation, org chart, and a human point of contact.
 
@@ -388,7 +388,7 @@ Create `meta/domain-index.md` with entries like:
 
 ---
 
-## Step 2 — Map Your Data Sources
+## Step 2;  Map Your Data Sources
 
 **Who does this:** An LLM agent with a human providing access credentials or API tokens.
 
@@ -439,7 +439,7 @@ For each domain defined in Step 1, document the sources in `meta/domain-index.md
 
 ---
 
-## Step 3 — Define Source Authority
+## Step 3;  Define Source Authority
 
 **Who does this:** LLM agent, informed by a human domain expert for each domain.
 
@@ -469,7 +469,7 @@ Common examples: legal liability, data privacy timelines, security architecture 
 For each domain, produce an explicit table. Example for the engineering domain:
 
 ```markdown
-## Engineering Domain — Source Authority
+## Engineering Domain;  Source Authority
 
 | Source | Authority level | Best used for | Do NOT use for |
 |--------|----------------|---------------|----------------|
@@ -484,7 +484,7 @@ For each domain, produce an explicit table. Example for the engineering domain:
 
 ---
 
-## Step 4 — Create the Meta Seed Files
+## Step 4;  Create the Meta Seed Files
 
 **Who does this:** LLM agent.
 
@@ -495,7 +495,7 @@ For each domain, produce an explicit table. Example for the engineering domain:
 This file encodes the agent's identity, operating rules, and data model. Every worker agent reads this at the start of every run. It should be written specifically for your company but follow this template:
 
 ```markdown
-# ECL Agent — System Prompt
+# ECL Agent;  System Prompt
 
 ## Identity
 
@@ -571,7 +571,7 @@ The initial seed content should be exactly this and nothing more:
      Which tasks went wrong before a skill was added? -->
 ```
 
-> **Note:** The final section — *Superpowers skill effectiveness notes* — is new. It allows agents to record which skills proved valuable for which ECL task types. Over time this builds the same bottom-up reliability wisdom for process as the rest of the file builds for sources.
+> **Note:** The final section;  *Superpowers skill effectiveness notes*;  is new. It allows agents to record which skills proved valuable for which ECL task types. Over time this builds the same bottom-up reliability wisdom for process as the rest of the file builds for sources.
 
 ### 4.3 `meta/domain-index.md`
 
@@ -579,7 +579,7 @@ The completed domain index from Step 1. Used by agents to understand the full sc
 
 ---
 
-## Step 5 — Write the System Prompt
+## Step 5;  Write the System Prompt
 
 **Who does this:** LLM agent in collaboration with a human reviewer.
 
@@ -656,15 +656,15 @@ Any design decisions you make must be consistent with the ECL content.
 Any design decisions that conflict with ECL content must create a conflict note.
 ```
 
-This is analogous to what the ECL README already describes in Step 10 (Query Interface) — the same principle applied to design-time agents, not just query-time agents.
+This is analogous to what the ECL README already describes in Step 10 (Query Interface);  the same principle applied to design-time agents, not just query-time agents.
 
 ### 11.3 Integration Point 2: Skills as ECL Domain Content
 
 Team workflows, operating procedures, and engineering conventions can be stored as Superpowers-compatible `SKILL.md` files inside the ECL's `domains/skills/` domain. This has several important consequences:
 
-1. **Process becomes a first-class artifact.** Workflow knowledge is no longer buried in wikis — it lives in the same versioned, cited, conflict-aware layer as all other company knowledge.
+1. **Process becomes a first-class artifact.** Workflow knowledge is no longer buried in wikis;  it lives in the same versioned, cited, conflict-aware layer as all other company knowledge.
 2. **Skills are maintained like ECL content.** The maintenance agent can create `verify` tasks for stale skills, just like stale domain files. Skills that lag behind process change get flagged.
-3. **Skills have citations.** A skill for "how to run an incident retrospective" cites the Slack threads and retrospective docs that informed it — making the reasoning behind the process traceable.
+3. **Skills have citations.** A skill for "how to run an incident retrospective" cites the Slack threads and retrospective docs that informed it;  making the reasoning behind the process traceable.
 4. **Skills can cross-reference ECL knowledge.** A `closing-a-deal` skill can link to `domains/gtm/pricing-authority.md` and `domains/legal/contract-routing.md`, grounding the workflow in current facts.
 
 **Recommended initial skills to encode in `domains/skills/`:**
@@ -757,7 +757,7 @@ This workflow is particularly valuable for ECL tooling because the ECL worker lo
 
 ---
 
-## Step 6 — Build the Task System
+## Step 6;  Build the Task System
 
 **Who does this:** Engineer or LLM agent writing the runner script.
 
@@ -830,7 +830,7 @@ def claim_task(repo):
 
 ---
 
-## Step 7 — Implement the Worker Loop
+## Step 7;  Implement the Worker Loop
 
 **Who does this:** Engineer writing the runner script.
 
@@ -914,7 +914,7 @@ Every task execution is wrapped in a try/except. On failure:
 
 ---
 
-## Step 8 — Seed the Initial Content
+## Step 8;  Seed the Initial Content
 
 **Who does this:** LLM agent, running as a `seed` command before the worker loop starts.
 
@@ -937,7 +937,7 @@ feat(seed): import {N} files from {source_description}
 
 ---
 
-## Step 9 — Run the Maintenance Agent
+## Step 9;  Run the Maintenance Agent
 
 **Who does this:** A dedicated agent process running on a schedule (e.g., every 6 hours).
 
@@ -995,13 +995,13 @@ Global checks:
 
 ---
 
-## Step 10 — Build the Query Interface
+## Step 10;  Build the Query Interface
 
 **Who does this:** Engineer, after the ECL has initial content.
 
 **When:** After at least one full worker run has populated the major domain files.
 
-### Option A — Claude Code with Superpowers (recommended)
+### Option A;  Claude Code with Superpowers (recommended)
 
 Give Claude Code access to the ECL repository and ensure Superpowers is installed. The combined setup gives you:
 
@@ -1025,7 +1025,7 @@ If the ECL says to route this question, tell the user who to route to and why.
 If you are designing a solution, follow the brainstorming skill before producing output.
 ```
 
-### Option B — Direct API query agent
+### Option B;  Direct API query agent
 
 A lightweight Python script that:
 
@@ -1036,7 +1036,7 @@ A lightweight Python script that:
 
 Sufficient for most use cases. No vector database required for ECL repositories up to ~10,000 files.
 
-### Option C — Full RAG pipeline
+### Option C;  Full RAG pipeline
 
 For large ECLs (>10,000 files) or high query volume:
 
@@ -1061,7 +1061,7 @@ Regardless of option chosen:
 
 ## 17. Citation Rules
 
-Citations are the single most important quality control mechanism in the ECL. An agent writing without citations produces confident-sounding content with no traceability — harder to challenge and correct than a blank file.
+Citations are the single most important quality control mechanism in the ECL. An agent writing without citations produces confident-sounding content with no traceability;  harder to challenge and correct than a blank file.
 
 ### Mandatory citation format
 
@@ -1099,7 +1099,7 @@ with EMEA deals typically discounted 15–20%
 For high-confidence claims, require three independent sources. Note the corroboration:
 
 ```markdown
-> **Confidence: HIGH** — corroborated by three independent sources:
+> **Confidence: HIGH**;  corroborated by three independent sources:
 > 1. [[Source A]](path): description
 > 2. [[Source B]](path): description
 > 3. [[Source C]](path): description
@@ -1146,7 +1146,7 @@ An agent should add a backlink whenever it encounters:
 
 ### Why `how-to-get-accurate-information.md` is grown, not written
 
-The source reliability guide starts empty because invented reliability wisdom is worse than none. Over thousands of agent runs, this file accumulates the distilled experience of the entire agent fleet — including experience with which Superpowers skills worked well for which ECL task types.
+The source reliability guide starts empty because invented reliability wisdom is worse than none. Over thousands of agent runs, this file accumulates the distilled experience of the entire agent fleet;  including experience with which Superpowers skills worked well for which ECL task types.
 
 ### Conflict resolution protocol
 
@@ -1219,7 +1219,7 @@ done
 - For people and org-related content
 - For legal, security, and compliance content
 - Periodically for the highest-traffic topics
-- **When a Superpowers skill is first created or substantially revised** — skills encode team processes; humans must confirm the encoding is accurate before agents follow it
+- **When a Superpowers skill is first created or substantially revised**;  skills encode team processes; humans must confirm the encoding is accurate before agents follow it
 
 ### Human review workflow
 
@@ -1274,11 +1274,11 @@ Drift occurs when the real world changes but the ECL does not. Sources of drift:
 ### Drift severity
 
 ```
-🔴 Critical drift  — Conflict with a live customer commitment or legal obligation
-🟠 High drift      — Feature status, pricing, routing rule, or active skill is outdated
-🟡 Medium drift    — Process documentation or skill lags new practice
-🟢 Low drift       — Minor update; content still broadly accurate
-⚪ No drift        — Content matches current sources
+🔴 Critical drift ;  Conflict with a live customer commitment or legal obligation
+🟠 High drift     ;  Feature status, pricing, routing rule, or active skill is outdated
+🟡 Medium drift   ;  Process documentation or skill lags new practice
+🟢 Low drift      ;  Minor update; content still broadly accurate
+⚪ No drift       ;  Content matches current sources
 ```
 
 ---
@@ -1333,7 +1333,7 @@ Drift occurs when the real world changes but the ECL does not. Sources of drift:
 
 **The ECL is not a code execution engine.** Superpowers provides agent execution discipline; the ECL provides the knowledge those agents run on. They are not the same system, even when used together.
 
-**The ECL is not finished.** It is never finished. The target state is not "ECL is complete" — it is "ECL is continuously maintained."
+**The ECL is not finished.** It is never finished. The target state is not "ECL is complete";  it is "ECL is continuously maintained."
 
 ---
 
@@ -1380,8 +1380,8 @@ An LLM agent starting a new ECL from scratch should complete these steps in orde
 - **Step 5:** Human review of system prompt
 - **Step 11.1:** Install Superpowers on the primary agent (Claude Code plugin or equivalent)
 - **Step 11.3:** Create stub `SKILL.md` files for the team's highest-priority workflows in `domains/skills/`
-- **Step 6:** Implement task system (YAML schema, locking protocol, priority levels, `skill-verify` task kind) — use Superpowers' brainstorm + write-plan + TDD workflow
-- **Step 7:** Implement worker loop (pull → read skill → claim → execute → release → sleep) — use Superpowers' TDD + subagent execution
+- **Step 6:** Implement task system (YAML schema, locking protocol, priority levels, `skill-verify` task kind);  use Superpowers' brainstorm + write-plan + TDD workflow
+- **Step 7:** Implement worker loop (pull → read skill → claim → execute → release → sleep);  use Superpowers' TDD + subagent execution
 - **Step 8:** Seed existing docs, domain READMEs, source snapshots, and initial skill stubs
 - **Step 9:** Start maintenance agent; define staleness SLAs including 30-day SLA for skills
 - **Step 10:** Build query interface (start with Claude Code + Superpowers; migrate later if needed)
