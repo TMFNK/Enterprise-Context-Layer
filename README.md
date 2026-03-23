@@ -1,7 +1,7 @@
 # Enterprise Context Layer (ECL)
 
-> _"The central intelligence that encompasses all knowledge for your company — able to answer any question, self-updating, built from ~1000 lines of Python and a Git repo."_
-> — Andy Chen
+> _"The central intelligence that encompasses all knowledge for your company. It's able to answer any question, self-updating, built from ~1000 lines of Python and a Git repo."_
+> Andy Chen
 
 A self-maintaining Git repository that encodes how your company actually works. Not a search engine. Not a chatbot. A living, cited, conflict-aware institutional memory built and kept current by LLM agents running continuously against your real data sources.
 
@@ -23,11 +23,11 @@ The ECL is a Git repository of Markdown files. LLM agents read your company's so
 
 Three design patterns make this work:
 
-**ECL Pattern** (Andy Chen) — Knowledge is synthesised into Markdown files organised by domain folder. The folder structure is the taxonomy. Backlinks between files are the knowledge graph. No ontology engine, no graph database; just folders and plain text that any LLM reads natively.
+**ECL Pattern** (Andy Chen): Knowledge is synthesised into Markdown files organised by domain folder. The folder structure is the taxonomy. Backlinks between files are the knowledge graph. No ontology engine, no graph database; just folders and plain text that any LLM reads natively.
 
-**C-Compiler Pattern** (Anthropic) — Multiple agents coordinate without a central broker. Each task is a YAML file. An agent claims a task by writing a `.LOCKED` sidecar and pushing to git. If the push is rejected, another agent got there first. Git's push-rejection mechanism is the distributed mutex.
+**C-Compiler Pattern** (Anthropic): Multiple agents coordinate without a central broker. Each task is a YAML file. An agent claims a task by writing a `.LOCKED` sidecar and pushing to git. If the push is rejected, another agent got there first. Git's push-rejection mechanism is the distributed mutex.
 
-**Superpowers Pattern** (Jesse Vincent) — Agent quality comes from process discipline, not just prompt quality. Before any non-trivial task, agents load a `SKILL.md` file that defines the mandatory workflow for that task type. Team workflows are themselves stored as skill files inside the ECL, making process a first-class, versioned, citable artifact.
+**Superpowers Pattern** (Jesse Vincent): Agent quality comes from process discipline, not just prompt quality. Before any non-trivial task, agents load a `SKILL.md` file that defines the mandatory workflow for that task type. Team workflows are themselves stored as skill files inside the ECL, making process a first-class, versioned, citable artifact.
 
 ---
 
@@ -35,11 +35,11 @@ Three design patterns make this work:
 
 This project contains three documents, each written for a different reader:
 
-| File                        | Written for                           | Purpose                                                                                                            |
-| --------------------------- | ------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
-| **`README.md`** (this file) | Humans                                | Overview, how to run, what each file does                                                                          |
-| **`readme-for-agents.md`**  | LLM agents (Claude Code, Codex, etc.) | Complete build specification with runnable code — the blueprint an agent follows to construct the ECL from scratch |
-| **`readme-for-humans.md`**  | Engineers and architects              | Deep conceptual background, design rationale, and the original thinking behind the three patterns                  |
+| File                        | Written for                           | Purpose                                                                                                           |
+| --------------------------- | ------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| **`README.md`** (this file) | Humans                                | Overview, how to run, what each file does                                                                         |
+| **`readme-for-agents.md`**  | LLM agents (Claude Code, Codex, etc.) | Complete build specification with runnable code, the blueprint an agent follows to construct the ECL from scratch |
+| **`readme-for-humans.md`**  | Engineers and architects              | Deep conceptual background, design rationale, and the original thinking behind the three patterns                 |
 
 **If you want to understand the system:** read `readme-for-humans.md`.
 
@@ -110,7 +110,7 @@ The identity and rules file that every worker agent reads at the start of every 
 
 ### `meta/how-to-get-accurate-information.md`
 
-The most important file in the ECL — and it starts completely empty. You do not pre-fill it. Agents add to it over time as they discover which sources are stale, which tool calls return unreliable results, and which questions should always be escalated. After thousands of agent runs it becomes a dense, experience-grounded guide to navigating your company's specific information landscape. Invented wisdom is worse than none; real experience is invaluable.
+The most important file in the ECL; and it starts completely empty. You do not pre-fill it. Agents add to it over time as they discover which sources are stale, which tool calls return unreliable results, and which questions should always be escalated. After thousands of agent runs it becomes a dense, experience-grounded guide to navigating your company's specific information landscape. Invented wisdom is worse than none; real experience is invaluable.
 
 ### `meta/domain-index.md`
 
@@ -152,7 +152,7 @@ Drift detection reports and agent error logs. Drift reports summarise which file
 - An Anthropic API key (or your preferred LLM provider's credentials)
 - API access to your company's source systems (Slack, Jira, Confluence, etc.)
 
-### Step 1 — Bootstrap with an LLM agent
+### Step 1 Bootstrap with an LLM agent
 
 The ECL is built by an LLM agent following `readme-for-agents.md`. Open Claude Code (or Codex) in this repository and give it this prompt:
 
@@ -163,9 +163,9 @@ Before you write any files, ask me the discovery questions in Step 1.
 
 The agent will interview you about your company's knowledge domains, map your data sources, and scaffold the entire repository structure including meta files, domain folders, and initial skill stubs.
 
-**This takes 30–90 minutes of interactive session with a human providing answers.** Do not skip the interview phase — the ECL's quality depends entirely on accurate domain mapping and source authority definitions.
+**This takes 30–90 minutes of interactive session with a human providing answers.** Do not skip the interview phase; the ECL's quality depends entirely on accurate domain mapping and source authority definitions.
 
-### Step 2 — Review `meta/system-prompt.md`
+### Step 2 Review `meta/system-prompt.md`
 
 After the agent completes Step 4 of the checklist, **stop and review `meta/system-prompt.md` yourself** before letting any workers run. This file governs all agent behaviour. Check that:
 
@@ -175,7 +175,7 @@ After the agent completes Step 4 of the checklist, **stop and review `meta/syste
 
 This is the one step that requires human sign-off.
 
-### Step 3 — Run the worker
+### Step 3 Run the worker
 
 ```bash
 # Single worker (start here)
@@ -189,7 +189,7 @@ done
 
 Workers run continuously: claim a task, execute it, release it, repeat. They sleep with exponential backoff when the queue is empty (30s → 60s → ... → 5 min cap).
 
-### Step 4 — Run the maintenance agent
+### Step 4 Run the maintenance agent
 
 ```bash
 # Run once manually to create the initial task batch
@@ -201,7 +201,7 @@ uv run ecl-runner.py maintenance --repo .
 
 The maintenance agent scans every domain for stale content, missing files, unresolved conflicts, and outdated skill files, then creates appropriately prioritised tasks for workers to address.
 
-### Step 5 — Query the ECL
+### Step 5 Query the ECL
 
 **Recommended:** Give Claude Code access to the repository with this system prompt:
 
@@ -246,7 +246,7 @@ Non-PII data is retained for 180 days for analytics purposes
 [[Legal: Data Retention Policy v3.1, 2026-02-01]](../../sources/legal/data-retention-v3.1.md).
 
 > ⚠️ **Conflict (resolved 2026-03-15):** The engineering deletion runbook previously
-> described a 120-day pipeline for all data. This has been corrected — the runbook
+> described a 120-day pipeline for all data. This has been corrected and becomes the runbook
 > lagged a Q4 2025 policy update. See [[INFRA-4892]](../../sources/jira/INFRA-4892.md).
 > Runbook updated 2026-03-10.
 
@@ -296,9 +296,9 @@ All coordination happens through git. Workers on Modal, AWS Lambda, Kubernetes, 
 
 This project is an implementation template synthesising three published ideas:
 
-- **[The Enterprise Context Layer](https://andychen32.substack.com/p/the-enterprise-context-layer)** — Andy Chen's original design: synthesis over retrieval, git as single source of truth, the folder-as-taxonomy pattern.
-- **[Building a C Compiler with Claude](https://www.anthropic.com/engineering/building-c-compiler)** — Anthropic's C-Compiler pattern: file-based distributed locking via git push-rejection, enabling parallel agents with no central broker.
-- **[Superpowers](https://github.com/obra/superpowers)** — Jesse Vincent's agentic skills framework: `SKILL.md` files as mandatory agent workflows, process discipline as a first-class engineering concern.
+- **[The Enterprise Context Layer](https://andychen32.substack.com/p/the-enterprise-context-layer)** Andy Chen's original design: synthesis over retrieval, git as single source of truth, the folder-as-taxonomy pattern.
+- **[Building a C Compiler with Claude](https://www.anthropic.com/engineering/building-c-compiler)** Anthropic's C-Compiler pattern: file-based distributed locking via git push-rejection, enabling parallel agents with no central broker.
+- **[Superpowers](https://github.com/obra/superpowers)** Jesse Vincent's agentic skills framework: `SKILL.md` files as mandatory agent workflows, process discipline as a first-class engineering concern.
 
 ---
 
