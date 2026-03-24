@@ -1,6 +1,7 @@
-[![AI Slop Inside](https://sladge.net/badge.svg)](https://sladge.net)
-
 # Enterprise Context Layer (ECL)
+
+[![AI Slop Inside](https://sladge.net/badge.svg)](https://sladge.net)
+by [TMFNK](https://x.com/4tmfnk).
 
 > _"The central intelligence that encompasses all knowledge for your company. It's able to answer any question, self-updating, built from ~1000 lines of Python and a Git repo."_
 > Andy Chen
