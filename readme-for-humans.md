@@ -1,7 +1,6 @@
 # Enterprise Context Layer (ECL)
 
-> *"The central intelligence that encompasses all knowledge for your company. It is able to answer any question, self-updating, built from ~1000 lines of Python and a Git repo."*
-> Andy Chen, [The Enterprise Context Layer](https://andychen32.substack.com/p/the-enterprise-context-layer)
+> Andy Chen built the first production ECL at Abnormal Security: a living Git repository that encodes how a company actually works, maintained by parallel LLM agents reading primary sources and writing cited synthesis documents. His essay: [The Enterprise Context Layer](https://andychen32.substack.com/p/the-enterprise-context-layer).
 
 ---
 
@@ -11,7 +10,7 @@ The Enterprise Context Layer is not a database. It is not a search engine. It is
 
 It is a **living, self-maintaining Git repository** that encodes how your company actually works; the institutional memory, judgment calls, org behaviour, process reality, and cross-domain relationships that no retrieval system can derive on its own.
 
-Traditional RAG (Retrieval-Augmented Generation) fetches documents. The ECL synthesises understanding. When a sales rep asks "how long do we keep customer data after churn?", a retrieval system returns the closest policy document. The ECL returns: *"Don't answer this yourself; route to the security team. Here is why, with three cited incidents where reps got this wrong."*
+Traditional RAG (Retrieval-Augmented Generation) fetches documents. The ECL synthesises understanding. When a sales rep asks "how long do we keep customer data after churn?", a retrieval system returns the closest policy document. The ECL returns: _"Don't answer this yourself; route to the security team. Here is why, with three cited incidents where reps got this wrong."_
 
 The difference is synthesis over retrieval. The ECL contains the reasoning frameworks your experts use, not just the raw facts they work with.
 
@@ -21,22 +20,22 @@ The difference is synthesis over retrieval. The ECL contains the reasoning frame
 
 ## ⚡ Superpowers Integration
 
-This implementation adds [Superpowers](https://github.com/obra/superpowers);  an agentic skills framework;  as a first-class component of the ECL architecture. Superpowers gives structure and discipline to the agents that *build* the ECL, the agents that *query* it, and the developers who *maintain* the tooling itself.
+This implementation adds [Superpowers](https://github.com/obra/superpowers) — Jesse Vincent's agentic skills framework as an extension to the ECL architecture. Superpowers gives structure and discipline to the agents that _build_ the ECL, the agents that _query_ it, and the developers who _maintain_ the tooling itself.
 
 The two systems are complementary at every layer:
 
-| Layer | ECL's role | Superpowers' role |
-|-------|------------|-------------------|
-| Knowledge | Stores *what* the company knows | Gives agents a *how-to* for building that knowledge |
-| Agent behaviour | Defines worker task lifecycle | Provides skills (brainstorm → plan → TDD → review) that execute each task well |
-| Development process | Describes the runner codebase | Enforces TDD, systematic debugging, and subagent-driven development on the codebase |
-| Process encoding | Stores process docs as Markdown | Stores team workflows as reusable Superpowers skill files |
+| Layer               | ECL's role                      | Superpowers' role                                                                                               |
+| ------------------- | ------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| Knowledge           | Stores _what_ the company knows | Gives agents a _how-to_ for building that knowledge                                                             |
+| Agent behaviour     | Defines worker task lifecycle   | Provides skills (`brainstorming` → `writing-plans` → `subagent-driven-development`) that execute each task well |
+| Development process | Describes the runner codebase   | Enforces TDD, systematic debugging, and subagent-driven development on the codebase                             |
+| Process encoding    | Stores process docs as Markdown | Stores team workflows as reusable Superpowers skill files                                                       |
 
 There are three distinct integration points, described fully in [Section 11 (Superpowers Integration)](#11-superpowers-integration):
 
-1. **ECL as grounding for Superpowers agents**;  before a Superpowers agent brainstorms or writes a plan, it reads the ECL to anchor its design in real architectural decisions, existing patterns, and team conventions.
-2. **Skills as ECL domain content**;  team workflows, engineering conventions, and operating procedures are stored as Superpowers-compatible `SKILL.md` files inside the ECL's `domains/` tree, making process a first-class, maintained, citable artifact.
-3. **Superpowers as the build methodology for ECL tooling**;  when implementing or extending the runner, worker loop, or query interface, use Superpowers' brainstorm → plan → subagent-TDD → code-review workflow.
+1. **ECL as grounding for Superpowers agents**; before a Superpowers agent brainstorms or writes a plan, it reads the ECL to anchor its design in real architectural decisions, existing patterns, and team conventions.
+2. **Skills as ECL domain content**; team workflows, engineering conventions, and operating procedures are stored as Superpowers-compatible `SKILL.md` files inside the ECL's `domains/` tree, making process a first-class, maintained, citable artifact.
+3. **Superpowers as the build methodology for ECL tooling**; when implementing or extending the runner, worker loop, or query interface, use Superpowers' brainstorm → plan → subagent-TDD → code-review workflow.
 
 ---
 
@@ -47,17 +46,17 @@ There are three distinct integration points, described fully in [Section 11 (Sup
 3. [Architecture Overview](#3-architecture-overview)
 4. [Repository Structure](#4-repository-structure)
 5. [The Three Foundational Patterns](#5-the-three-foundational-patterns)
-6. [Step 1:  Discover Your Company's Knowledge Domains](#step-1--discover-your-companys-knowledge-domains)
-7. [Step 2:  Map Your Data Sources](#step-2--map-your-data-sources)
-8. [Step 3:  Define Source Authority](#step-3--define-source-authority)
-9. [Step 4:  Create the Meta Seed Files](#step-4--create-the-meta-seed-files)
-10. [Step 5:  Write the System Prompt](#step-5--write-the-system-prompt)
+6. [Step 1: Discover Your Company's Knowledge Domains](#step-1--discover-your-companys-knowledge-domains)
+7. [Step 2: Map Your Data Sources](#step-2--map-your-data-sources)
+8. [Step 3: Define Source Authority](#step-3--define-source-authority)
+9. [Step 4: Create the Meta Seed Files](#step-4--create-the-meta-seed-files)
+10. [Step 5: Write the System Prompt](#step-5--write-the-system-prompt)
 11. [Superpowers Integration](#11-superpowers-integration)
-12. [Step 6:  Build the Task System](#step-6--build-the-task-system)
-13. [Step 7:  Implement the Worker Loop](#step-7--implement-the-worker-loop)
-14. [Step 8:  Seed the Initial Content](#step-8--seed-the-initial-content)
-15. [Step 9:  Run the Maintenance Agent](#step-9--run-the-maintenance-agent)
-16. [Step 10:  Build the Query Interface](#step-10--build-the-query-interface)
+12. [Step 6: Build the Task System](#step-6--build-the-task-system)
+13. [Step 7: Implement the Worker Loop](#step-7--implement-the-worker-loop)
+14. [Step 8: Seed the Initial Content](#step-8--seed-the-initial-content)
+15. [Step 9: Run the Maintenance Agent](#step-9--run-the-maintenance-agent)
+16. [Step 10: Build the Query Interface](#step-10--build-the-query-interface)
 17. [Citation Rules](#17-citation-rules)
 18. [The Context Graph: Backlinks and Cross-References](#18-the-context-graph-backlinks-and-cross-references)
 19. [Source Reliability and Conflict Resolution](#19-source-reliability-and-conflict-resolution)
@@ -135,19 +134,19 @@ A documented conflict is vastly more useful than a silently chosen winner, becau
 
 There are no ontology graphs, no semantic layers, no knowledge base schemas to maintain. The taxonomy is the folder structure. The context graph is the backlinks between files.
 
-When an agent discovers that "data retention questions" are connected to "GTM routing rules" and "security escalation policy", it writes a backlink in each relevant file pointing to the others. Over thousands of agent runs, these backlinks accumulate into a rich, navigable web of cross-domain understanding;  built entirely from plain Markdown that any LLM can read and traverse.
+When an agent discovers that "data retention questions" are connected to "GTM routing rules" and "security escalation policy", it writes a backlink in each relevant file pointing to the others. Over thousands of agent runs, these backlinks accumulate into a rich, navigable web of cross-domain understanding; built entirely from plain Markdown that any LLM can read and traverse.
 
 ### 1.5 Architecture Claims Are Durable; Status Claims Are Ephemeral
 
 Different facts have different half-lives. The ECL must encode this explicitly:
 
-| Claim type | Example | Half-life | Agent behaviour |
-|------------|---------|-----------|-----------------|
-| Architecture | "We use an event-driven microservices architecture" | Years | Write with high confidence; rarely re-verify |
-| Process | "Incident severity is determined by the on-call lead" | Months | Write with medium confidence; schedule re-verification |
-| Status | "Feature X is in beta for EU customers" | Days–weeks | Write with explicit timestamp; flag for immediate staleness check |
-| People/roles | "Jane Smith owns the enterprise accounts" | Months | Write with person + date; flag for org-change triggers |
-| Pricing | "Enterprise tier starts at $50k" | Weeks–months | Write with date; link to source |
+| Claim type   | Example                                               | Half-life    | Agent behaviour                                                   |
+| ------------ | ----------------------------------------------------- | ------------ | ----------------------------------------------------------------- |
+| Architecture | "We use an event-driven microservices architecture"   | Years        | Write with high confidence; rarely re-verify                      |
+| Process      | "Incident severity is determined by the on-call lead" | Months       | Write with medium confidence; schedule re-verification            |
+| Status       | "Feature X is in beta for EU customers"               | Days–weeks   | Write with explicit timestamp; flag for immediate staleness check |
+| People/roles | "Jane Smith owns the enterprise accounts"             | Months       | Write with person + date; flag for org-change triggers            |
+| Pricing      | "Enterprise tier starts at $50k"                      | Weeks–months | Write with date; link to source                                   |
 
 Every ECL file should note the confidence level and last-verified date of its claims. The maintenance agent uses this to schedule re-verification tasks.
 
@@ -160,11 +159,11 @@ An ECL is the right tool when your organisation faces one or more of these condi
 - **Tribal knowledge problem:** Critical institutional knowledge lives in the heads of a few people and is lost when they leave.
 - **Source conflict problem:** Multiple systems (Confluence, Notion, Slack, email, code comments) describe the same process differently, and no one knows which is authoritative.
 - **Escalation routing problem:** Customer-facing and internal teams frequently give wrong answers because they cannot reliably distinguish "answer this" from "route this to an expert."
-- **Cross-domain gap problem:** Understanding a customer situation requires combining knowledge from product, legal, finance, and engineering;  but these teams never produce a unified view.
+- **Cross-domain gap problem:** Understanding a customer situation requires combining knowledge from product, legal, finance, and engineering; but these teams never produce a unified view.
 - **Onboarding cost problem:** New employees take months to become productive because the knowledge they need is scattered across dozens of systems.
 - **AI agent grounding problem:** You are building LLM-powered agents but they hallucinate or give outdated answers because there is no reliable, structured knowledge base to ground them.
 
-The ECL is **not** the right tool as a replacement for a proper search engine over raw documents. Use a tool like Glean, Elastic, or a vector database for that. The ECL sits above retrieval;  it is the synthesised, conflict-resolved, citations-verified layer that search cannot produce.
+The ECL is **not** the right tool as a replacement for a proper search engine over raw documents. Use a tool like Glean, Elastic, or a vector database for that. The ECL sits above retrieval; it is the synthesised, conflict-resolved, citations-verified layer that search cannot produce.
 
 ---
 
@@ -271,15 +270,15 @@ ecl-repo/
 
 ### File naming conventions
 
-| File type | Convention | Example |
-|-----------|-----------|---------|
-| Domain topic | `kebab-case.md` | `data-retention-policy.md` |
-| Mapping notes | `mapping-notes.md` per domain | `domains/legal/mapping-notes.md` |
-| Task file | `YYYYMMDDTHHMMSS-{domain}-{kind}-{slug}.yaml` | `20260315T101500-product-synthesise-a1b2c3d4.yaml` |
-| Lock file | Same as task + `.LOCKED` | `20260315T101500-product-synthesise-a1b2c3d4.LOCKED` |
-| Source snapshot | Descriptive name with date | `slack-sales-ops-2026-02-14.md` |
-| Drift report | `drift-YYYY-MM-DD.md` | `drift-2026-03-21.md` |
-| Skill file | `SKILL.md` inside named folder | `domains/skills/incident-response/SKILL.md` |
+| File type       | Convention                                    | Example                                              |
+| --------------- | --------------------------------------------- | ---------------------------------------------------- |
+| Domain topic    | `kebab-case.md`                               | `data-retention-policy.md`                           |
+| Mapping notes   | `mapping-notes.md` per domain                 | `domains/legal/mapping-notes.md`                     |
+| Task file       | `YYYYMMDDTHHMMSS-{domain}-{kind}-{slug}.yaml` | `20260315T101500-product-synthesise-a1b2c3d4.yaml`   |
+| Lock file       | Same as task + `.LOCKED`                      | `20260315T101500-product-synthesise-a1b2c3d4.LOCKED` |
+| Source snapshot | Descriptive name with date                    | `slack-sales-ops-2026-02-14.md`                      |
+| Drift report    | `drift-YYYY-MM-DD.md`                         | `drift-2026-03-21.md`                                |
+| Skill file      | `SKILL.md` inside named folder                | `domains/skills/incident-response/SKILL.md`          |
 
 ---
 
@@ -289,7 +288,7 @@ The ECL implementation is built on three design patterns. Understanding all thre
 
 ### 5.1 ECL Pattern (Andy Chen)
 
-The insight: synthesis and retrieval are different problems. Retrieval finds the best matching document. Synthesis builds a mental model;  the reasoning framework an expert uses, not just the facts they cite.
+The insight: synthesis and retrieval are different problems. Retrieval finds the best matching document. Synthesis builds a mental model; the reasoning framework an expert uses, not just the facts they cite.
 
 The ECL encodes synthesis as Markdown files with inline citations in a Git repo. Every run by every agent appends to the repo's knowledge. Over thousands of agent runs, the repo accumulates:
 
@@ -334,11 +333,11 @@ Applied to the ECL:
 
 Skills are **mandatory workflows, not suggestions**. The agent checks for a relevant skill before any non-trivial action.
 
-The ECL also *stores* skills as domain content, making team processes first-class, maintained, citable artifacts in the knowledge layer;  not buried in wikis.
+The ECL also _stores_ skills as domain content, making team processes first-class, maintained, citable artifacts in the knowledge layer; not buried in wikis.
 
 ---
 
-## Step 1:  Discover Your Company's Knowledge Domains
+## Step 1: Discover Your Company's Knowledge Domains
 
 **Who does this:** An LLM agent with access to the company's documentation, org chart, and a human point of contact.
 
@@ -350,12 +349,12 @@ A domain is a coherent area of company knowledge that has clear ownership, a def
 
 Examples by company type:
 
-| Company type | Typical domains |
-|-------------|----------------|
-| SaaS B2B | `product`, `engineering`, `gtm`, `legal`, `security`, `customer-success`, `finance`, `people`, `skills` |
-| E-commerce | `product-catalogue`, `supply-chain`, `logistics`, `customer-service`, `marketing`, `legal`, `finance`, `skills` |
-| Healthcare | `clinical-protocols`, `regulatory`, `patient-services`, `billing`, `it-systems`, `hr`, `skills` |
-| Manufacturing | `production`, `quality`, `supply-chain`, `safety`, `engineering`, `commercial`, `hr`, `skills` |
+| Company type  | Typical domains                                                                                                 |
+| ------------- | --------------------------------------------------------------------------------------------------------------- |
+| SaaS B2B      | `product`, `engineering`, `gtm`, `legal`, `security`, `customer-success`, `finance`, `people`, `skills`         |
+| E-commerce    | `product-catalogue`, `supply-chain`, `logistics`, `customer-service`, `marketing`, `legal`, `finance`, `skills` |
+| Healthcare    | `clinical-protocols`, `regulatory`, `patient-services`, `billing`, `it-systems`, `hr`, `skills`                 |
+| Manufacturing | `production`, `quality`, `supply-chain`, `safety`, `engineering`, `commercial`, `hr`, `skills`                  |
 
 > **Note:** Always add a `skills` domain. This is where team workflows are stored as Superpowers skill files. See [Section 11](#11-superpowers-integration) for details.
 
@@ -376,19 +375,19 @@ Create `meta/domain-index.md` with entries like:
 ```markdown
 # Domain Index
 
-| Domain | Folder | Owner | Primary sources | Notes |
-|--------|--------|-------|----------------|-------|
-| Product | domains/product/ | @product-lead | Confluence, Jira, PRDs, release notes | |
-| Engineering | domains/engineering/ | @engineering-lead | GitHub, runbooks, ADRs, on-call logs | |
-| GTM | domains/gtm/ | @sales-ops | Salesforce, Gong, Slack #sales | High staleness risk |
-| Legal | domains/legal/ | @general-counsel | Legal docs, contracts, policy documents | Many ROUTE-NOT-ANSWER |
-| People | domains/people/ | @hr-lead | HRIS, org chart, Slack #general | |
-| Skills | domains/skills/ | @engineering-lead | Team retrospectives, runbooks, PRs | Superpowers SKILL.md files |
+| Domain      | Folder               | Owner             | Primary sources                         | Notes                      |
+| ----------- | -------------------- | ----------------- | --------------------------------------- | -------------------------- |
+| Product     | domains/product/     | @product-lead     | Confluence, Jira, PRDs, release notes   |                            |
+| Engineering | domains/engineering/ | @engineering-lead | GitHub, runbooks, ADRs, on-call logs    |                            |
+| GTM         | domains/gtm/         | @sales-ops        | Salesforce, Gong, Slack #sales          | High staleness risk        |
+| Legal       | domains/legal/       | @general-counsel  | Legal docs, contracts, policy documents | Many ROUTE-NOT-ANSWER      |
+| People      | domains/people/      | @hr-lead          | HRIS, org chart, Slack #general         |                            |
+| Skills      | domains/skills/      | @engineering-lead | Team retrospectives, runbooks, PRs      | Superpowers SKILL.md files |
 ```
 
 ---
 
-## Step 2:  Map Your Data Sources
+## Step 2: Map Your Data Sources
 
 **Who does this:** An LLM agent with a human providing access credentials or API tokens.
 
@@ -402,44 +401,45 @@ The ECL's quality is entirely determined by the quality and coverage of its sour
 
 #### Internal structured sources (highest authority for operational truth)
 
-| Source type | What it's best for | Typical access method | Staleness risk |
-|-------------|-------------------|----------------------|----------------|
-| Source code / Git | How software actually behaves; feature flags; config | GitHub/GitLab API or local clone | Low |
-| Production database schema | Data model ground truth | Read-only DB connection or ERD export | Low |
-| ERP / CRM (e.g. Salesforce) | Customer records, deal data, pipeline | API or export | Medium |
-| HRIS (e.g. Workday) | Org chart, headcount, roles | API or export | Medium |
-| Ticketing (e.g. Jira) | Bug status, feature status, sprint state | REST API | Low for status; medium for priority |
-| Billing system | Subscription, churn, revenue data | API or export | Low |
+| Source type                 | What it's best for                                   | Typical access method                 | Staleness risk                      |
+| --------------------------- | ---------------------------------------------------- | ------------------------------------- | ----------------------------------- |
+| Source code / Git           | How software actually behaves; feature flags; config | GitHub/GitLab API or local clone      | Low                                 |
+| Production database schema  | Data model ground truth                              | Read-only DB connection or ERD export | Low                                 |
+| ERP / CRM (e.g. Salesforce) | Customer records, deal data, pipeline                | API or export                         | Medium                              |
+| HRIS (e.g. Workday)         | Org chart, headcount, roles                          | API or export                         | Medium                              |
+| Ticketing (e.g. Jira)       | Bug status, feature status, sprint state             | REST API                              | Low for status; medium for priority |
+| Billing system              | Subscription, churn, revenue data                    | API or export                         | Low                                 |
 
 #### Internal unstructured sources (high authority for process and culture)
 
-| Source type | What it's best for | Typical access method | Staleness risk |
-|-------------|-------------------|----------------------|----------------|
-| Slack | Real process (vs. documented ideal); informal decisions | Slack API + search | High |
-| Gong / call recordings | What customers actually ask; how reps answer | Gong API | High |
-| Email threads | Executive decisions; legal discussions | Gmail/Outlook API | High |
-| Confluence / Notion | Process documentation; onboarding; policies | REST API | Medium |
-| Google Drive / SharePoint | Presentations, reports, OKRs | Drive API | Medium |
+| Source type               | What it's best for                                      | Typical access method | Staleness risk |
+| ------------------------- | ------------------------------------------------------- | --------------------- | -------------- |
+| Slack                     | Real process (vs. documented ideal); informal decisions | Slack API + search    | High           |
+| Gong / call recordings    | What customers actually ask; how reps answer            | Gong API              | High           |
+| Email threads             | Executive decisions; legal discussions                  | Gmail/Outlook API     | High           |
+| Confluence / Notion       | Process documentation; onboarding; policies             | REST API              | Medium         |
+| Google Drive / SharePoint | Presentations, reports, OKRs                            | Drive API             | Medium         |
 
 #### External sources (authority for competitive and market context)
 
-| Source type | What it's best for | Access method | Staleness risk |
-|-------------|-------------------|--------------|----------------|
-| Competitor websites | Pricing, feature claims, positioning | Web scrape / manual | High |
-| G2 / Capterra / TrustRadius | Competitive perception, customer sentiment | Web scrape / API | Medium |
-| LinkedIn | Competitor headcount, leadership changes | Manual / API | Medium |
-| Regulatory bodies | Compliance requirements | Web scrape / download | Low |
+| Source type                 | What it's best for                         | Access method         | Staleness risk |
+| --------------------------- | ------------------------------------------ | --------------------- | -------------- |
+| Competitor websites         | Pricing, feature claims, positioning       | Web scrape / manual   | High           |
+| G2 / Capterra / TrustRadius | Competitive perception, customer sentiment | Web scrape / API      | Medium         |
+| LinkedIn                    | Competitor headcount, leadership changes   | Manual / API          | Medium         |
+| Regulatory bodies           | Compliance requirements                    | Web scrape / download | Low            |
 
 ### Output of this step
 
 For each domain defined in Step 1, document the sources in `meta/domain-index.md`, including:
+
 - Primary sources with access method and limitations
 - Source authority hierarchy (highest → lowest)
 - Known staleness patterns
 
 ---
 
-## Step 3:  Define Source Authority
+## Step 3: Define Source Authority
 
 **Who does this:** LLM agent, informed by a human domain expert for each domain.
 
@@ -450,7 +450,7 @@ For each domain defined in Step 1, document the sources in `meta/domain-index.md
 These apply across all domains. Record them in `meta/system-prompt.md`:
 
 **Principle 1: Operational reality beats documented ideal.**
-Source code shows what the system *does*. A Confluence page shows what someone *intended*.
+Source code shows what the system _does_. A Confluence page shows what someone _intended_.
 
 **Principle 2: Recent specific beats old general.**
 A Jira ticket from last week describing a specific bug is more reliable than a two-year-old architecture document.
@@ -469,22 +469,22 @@ Common examples: legal liability, data privacy timelines, security architecture 
 For each domain, produce an explicit table. Example for the engineering domain:
 
 ```markdown
-## Engineering Domain;  Source Authority
+## Engineering Domain; Source Authority
 
-| Source | Authority level | Best used for | Do NOT use for |
-|--------|----------------|---------------|----------------|
-| Source code (main branch) | PRIMARY | How a feature actually behaves | Future roadmap |
-| ADRs | PRIMARY | Why a design choice was made | Current state if ADR >1 year old |
-| On-call runbooks | HIGH | Incident triage; known failure modes | Normal operation flows |
-| Jira (last 6 months) | HIGH | Current bug/feature status | Historical context |
-| Engineering Confluence | MEDIUM | Intended design; onboarding | Actual current behaviour |
-| Slack #engineering (last 90 days) | MEDIUM | Emerging issues; informal decisions | Formal commitments |
-| Slack #engineering (>90 days) | LOW | Historical context only | Anything current |
+| Source                            | Authority level | Best used for                        | Do NOT use for                   |
+| --------------------------------- | --------------- | ------------------------------------ | -------------------------------- |
+| Source code (main branch)         | PRIMARY         | How a feature actually behaves       | Future roadmap                   |
+| ADRs                              | PRIMARY         | Why a design choice was made         | Current state if ADR >1 year old |
+| On-call runbooks                  | HIGH            | Incident triage; known failure modes | Normal operation flows           |
+| Jira (last 6 months)              | HIGH            | Current bug/feature status           | Historical context               |
+| Engineering Confluence            | MEDIUM          | Intended design; onboarding          | Actual current behaviour         |
+| Slack #engineering (last 90 days) | MEDIUM          | Emerging issues; informal decisions  | Formal commitments               |
+| Slack #engineering (>90 days)     | LOW             | Historical context only              | Anything current                 |
 ```
 
 ---
 
-## Step 4:  Create the Meta Seed Files
+## Step 4: Create the Meta Seed Files
 
 **Who does this:** LLM agent.
 
@@ -495,7 +495,7 @@ For each domain, produce an explicit table. Example for the engineering domain:
 This file encodes the agent's identity, operating rules, and data model. Every worker agent reads this at the start of every run. It should be written specifically for your company but follow this template:
 
 ```markdown
-# ECL Agent;  System Prompt
+# ECL Agent; System Prompt
 
 ## Identity
 
@@ -510,6 +510,7 @@ You are not a search engine. You are not a Q&A bot. You build institutional memo
 Before any non-trivial task, check domains/skills/ for a relevant SKILL.md.
 If a skill exists for your task type, read and follow it. Skills are mandatory
 workflows, not suggestions. Specifically:
+
 - Before synthesising a complex cross-domain topic → brainstorming skill
 - Before writing or modifying any ECL tooling code → writing-plans + TDD skill
 - Before pushing a large synthesise batch → requesting-code-review skill
@@ -525,12 +526,15 @@ workflows, not suggestions. Specifically:
 6. Backlink related files across domains.
 
 ## Source authority
+
 [Paste the company-specific authority table from Step 3]
 
 ## Domain map
+
 [Paste the domain index from Step 1]
 
 ## Available tools
+
 [List the specific tools this agent has access to]
 ```
 
@@ -571,7 +575,7 @@ The initial seed content should be exactly this and nothing more:
      Which tasks went wrong before a skill was added? -->
 ```
 
-> **Note:** The final section;  *Superpowers skill effectiveness notes*;  is new. It allows agents to record which skills proved valuable for which ECL task types. Over time this builds the same bottom-up reliability wisdom for process as the rest of the file builds for sources.
+> **Note:** The final section; _Superpowers skill effectiveness notes_; is new. It allows agents to record which skills proved valuable for which ECL task types. Over time this builds the same bottom-up reliability wisdom for process as the rest of the file builds for sources.
 
 ### 4.3 `meta/domain-index.md`
 
@@ -579,11 +583,11 @@ The completed domain index from Step 1. Used by agents to understand the full sc
 
 ---
 
-## Step 5:  Write the System Prompt
+## Step 5: Write the System Prompt
 
 **Who does this:** LLM agent in collaboration with a human reviewer.
 
-**When:** After Steps 1–4. This is the only step where human review before first use is strongly recommended.
+**When:** After Steps 1-4. This is the only step where human review before first use is strongly recommended.
 
 ### Checklist for a good system prompt
 
@@ -629,12 +633,14 @@ Verify installation by checking that these commands are available:
 The most powerful integration is also the simplest: before a Superpowers agent brainstorms a new feature or writes an implementation plan, it reads the relevant ECL domain files to ground itself in the company's actual architecture, conventions, and constraints.
 
 Without ECL grounding, an agent will:
+
 - Propose patterns inconsistent with the existing architecture
 - Suggest tools the company has already rejected
 - Miss routing rules for sensitive questions
 - Re-discover conflicts already documented
 
 With ECL grounding, an agent:
+
 - Designs within the actual architectural context
 - Follows already-decided conventions
 - Knows which questions to escalate
@@ -656,27 +662,27 @@ Any design decisions you make must be consistent with the ECL content.
 Any design decisions that conflict with ECL content must create a conflict note.
 ```
 
-This is analogous to what the ECL README already describes in Step 10 (Query Interface);  the same principle applied to design-time agents, not just query-time agents.
+This is analogous to what the ECL README already describes in Step 10 (Query Interface); the same principle applied to design-time agents, not just query-time agents.
 
 ### 11.3 Integration Point 2: Skills as ECL Domain Content
 
 Team workflows, operating procedures, and engineering conventions can be stored as Superpowers-compatible `SKILL.md` files inside the ECL's `domains/skills/` domain. This has several important consequences:
 
-1. **Process becomes a first-class artifact.** Workflow knowledge is no longer buried in wikis;  it lives in the same versioned, cited, conflict-aware layer as all other company knowledge.
+1. **Process becomes a first-class artifact.** Workflow knowledge is no longer buried in wikis; it lives in the same versioned, cited, conflict-aware layer as all other company knowledge.
 2. **Skills are maintained like ECL content.** The maintenance agent can create `verify` tasks for stale skills, just like stale domain files. Skills that lag behind process change get flagged.
-3. **Skills have citations.** A skill for "how to run an incident retrospective" cites the Slack threads and retrospective docs that informed it;  making the reasoning behind the process traceable.
+3. **Skills have citations.** A skill for "how to run an incident retrospective" cites the Slack threads and retrospective docs that informed it; making the reasoning behind the process traceable.
 4. **Skills can cross-reference ECL knowledge.** A `closing-a-deal` skill can link to `domains/gtm/pricing-authority.md` and `domains/legal/contract-routing.md`, grounding the workflow in current facts.
 
 **Recommended initial skills to encode in `domains/skills/`:**
 
-| Skill name | Trigger | Links to ECL domains |
-|-----------|---------|---------------------|
-| `incident-response` | Severity-1 alert | `engineering`, `security`, `people` |
-| `closing-a-deal` | Deal moves to negotiation stage | `gtm`, `legal`, `finance` |
-| `customer-data-request` | Customer asks for data export/deletion | `legal`, `security`, `engineering` |
-| `onboarding-new-engineer` | New hire joins engineering | `engineering`, `people`, `product` |
-| `ecl-synthesise-domain` | Agent begins synthesising a domain | `meta` |
-| `ecl-conflict-review` | Agent encounters a conflict | `meta` |
+| Skill name                | Trigger                                | Links to ECL domains                |
+| ------------------------- | -------------------------------------- | ----------------------------------- |
+| `incident-response`       | Severity-1 alert                       | `engineering`, `security`, `people` |
+| `closing-a-deal`          | Deal moves to negotiation stage        | `gtm`, `legal`, `finance`           |
+| `customer-data-request`   | Customer asks for data export/deletion | `legal`, `security`, `engineering`  |
+| `onboarding-new-engineer` | New hire joins engineering             | `engineering`, `people`, `product`  |
+| `ecl-synthesise-domain`   | Agent begins synthesising a domain     | `meta`                              |
+| `ecl-conflict-review`     | Agent encounters a conflict            | `meta`                              |
 
 **Skill file format (compatible with Superpowers):**
 
@@ -747,17 +753,17 @@ This workflow is particularly valuable for ECL tooling because the ECL worker lo
 
 **Minimum test coverage targets for ECL tooling:**
 
-| Component | Minimum coverage | Critical paths |
-|-----------|-----------------|----------------|
-| Task locking / claiming | 90% | Concurrent claim race, stale lock reclaim |
-| Git push / retry logic | 85% | Push rejection handling, exponential backoff |
-| Drift detection | 80% | Source change detection, staleness SLA evaluation |
-| Citation validation | 80% | Inline citation format, path resolution |
-| Conflict detection | 75% | Multi-source comparison, severity classification |
+| Component               | Minimum coverage | Critical paths                                    |
+| ----------------------- | ---------------- | ------------------------------------------------- |
+| Task locking / claiming | 90%              | Concurrent claim race, stale lock reclaim         |
+| Git push / retry logic  | 85%              | Push rejection handling, exponential backoff      |
+| Drift detection         | 80%              | Source change detection, staleness SLA evaluation |
+| Citation validation     | 80%              | Inline citation format, path resolution           |
+| Conflict detection      | 75%              | Multi-source comparison, severity classification  |
 
 ---
 
-## Step 6:  Build the Task System
+## Step 6: Build the Task System
 
 **Who does this:** Engineer or LLM agent writing the runner script.
 
@@ -771,43 +777,43 @@ Tasks are YAML files in `tasks/`. A task represents one unit of work.
 # tasks/20260321T091500-product-synthesise-a3f9b2c1.yaml
 
 domain: product
-kind: synthesise          # synthesise | verify | backlink | drift | dedupe | docs | skill-verify
+kind: synthesise # synthesise | verify | backlink | drift | dedupe | docs | skill-verify
 description: "Synthesise the feature flag inventory from source code and Jira"
 created_at: "20260321T091500"
-priority: 2               # 1 = most urgent
+priority: 2 # 1 = most urgent
 source_hints:
   - sources/code/feature-flags-export.md
   - sources/jira/feature-flag-tickets.md
 metadata:
   target_file: domains/product/feature-flags.md
   last_synthesised: null
-  superpowers_skill: null   # optional: path to a skill the agent should read before executing
+  superpowers_skill: null # optional: path to a skill the agent should read before executing
 ```
 
 ### Task kinds
 
-| Kind | Description | When to create |
-|------|-------------|----------------|
-| `synthesise` | Write or update an ECL topic file from sources | New topic; source has changed; file is missing |
-| `verify` | Re-check all claims in an existing file | File is stale; source has been updated |
-| `backlink` | Scan all domain files and add cross-domain references | Periodically; after major new content added |
-| `drift` | Compare current sources against last-synthesised snapshot | Scheduled; after a known system change |
-| `dedupe` | Identify duplicate content across domains | Periodically |
-| `docs` | AI review of mapping-notes to identify gaps | Periodically; on request |
-| `conflict-review` | Investigate a documented conflict | When a conflict note has been unresolved >30 days |
-| `skill-verify` | Re-verify a Superpowers skill file in `domains/skills/` | Skill is stale; referenced ECL content has drifted |
+| Kind              | Description                                               | When to create                                     |
+| ----------------- | --------------------------------------------------------- | -------------------------------------------------- |
+| `synthesise`      | Write or update an ECL topic file from sources            | New topic; source has changed; file is missing     |
+| `verify`          | Re-check all claims in an existing file                   | File is stale; source has been updated             |
+| `backlink`        | Scan all domain files and add cross-domain references     | Periodically; after major new content added        |
+| `drift`           | Compare current sources against last-synthesised snapshot | Scheduled; after a known system change             |
+| `dedupe`          | Identify duplicate content across domains                 | Periodically                                       |
+| `docs`            | AI review of mapping-notes to identify gaps               | Periodically; on request                           |
+| `conflict-review` | Investigate a documented conflict                         | When a conflict note has been unresolved >30 days  |
+| `skill-verify`    | Re-verify a Superpowers skill file in `domains/skills/`   | Skill is stale; referenced ECL content has drifted |
 
 ### Priority levels
 
-| Priority | Meaning |
-|----------|---------|
-| 1 | Drift detected; immediate re-verification needed |
-| 2 | Topic file or skill missing entirely |
-| 3 | Proof/verification file missing |
-| 4 | Stale content (>7 days for status claims; >30 days for process claims) |
-| 5 | Default / routine |
-| 6 | Low-priority enrichment (backlinks, deduplication) |
-| 7 | Scheduled maintenance (docs review, cross-domain scan, skill-verify) |
+| Priority | Meaning                                                                |
+| -------- | ---------------------------------------------------------------------- |
+| 1        | Drift detected; immediate re-verification needed                       |
+| 2        | Topic file or skill missing entirely                                   |
+| 3        | Proof/verification file missing                                        |
+| 4        | Stale content (>7 days for status claims; >30 days for process claims) |
+| 5        | Default / routine                                                      |
+| 6        | Low-priority enrichment (backlinks, deduplication)                     |
+| 7        | Scheduled maintenance (docs review, cross-domain scan, skill-verify)   |
 
 ### Locking protocol
 
@@ -830,7 +836,7 @@ def claim_task(repo):
 
 ---
 
-## Step 7:  Implement the Worker Loop
+## Step 7: Implement the Worker Loop
 
 **Who does this:** Engineer writing the runner script.
 
@@ -914,7 +920,7 @@ Every task execution is wrapped in a try/except. On failure:
 
 ---
 
-## Step 8:  Seed the Initial Content
+## Step 8: Seed the Initial Content
 
 **Who does this:** LLM agent, running as a `seed` command before the worker loop starts.
 
@@ -937,7 +943,7 @@ feat(seed): import {N} files from {source_description}
 
 ---
 
-## Step 9:  Run the Maintenance Agent
+## Step 9: Run the Maintenance Agent
 
 **Who does this:** A dedicated agent process running on a schedule (e.g., every 6 hours).
 
@@ -981,27 +987,27 @@ Global checks:
 
 ### Staleness SLAs by claim type
 
-| Claim type | Default SLA | Reasoning |
-|-----------|------------|-----------|
-| Pricing | 7 days | Changes frequently; expensive to get wrong |
-| Product status (beta/GA/deprecated) | 7 days | Changes with each sprint |
-| People / roles | 30 days | Org changes happen monthly |
-| Process documentation | 30 days | Process evolves but not daily |
-| Superpowers skills | 30 days | Team workflows evolve with practice |
-| Technical architecture | 90 days | Evolves slowly |
-| Competitive landscape | 14 days | Competitors ship fast |
-| Regulatory / compliance | 30 days | Consequences are high |
-| Historical analysis | Never | Past events don't change |
+| Claim type                          | Default SLA | Reasoning                                  |
+| ----------------------------------- | ----------- | ------------------------------------------ |
+| Pricing                             | 7 days      | Changes frequently; expensive to get wrong |
+| Product status (beta/GA/deprecated) | 7 days      | Changes with each sprint                   |
+| People / roles                      | 30 days     | Org changes happen monthly                 |
+| Process documentation               | 30 days     | Process evolves but not daily              |
+| Superpowers skills                  | 30 days     | Team workflows evolve with practice        |
+| Technical architecture              | 90 days     | Evolves slowly                             |
+| Competitive landscape               | 14 days     | Competitors ship fast                      |
+| Regulatory / compliance             | 30 days     | Consequences are high                      |
+| Historical analysis                 | Never       | Past events don't change                   |
 
 ---
 
-## Step 10:  Build the Query Interface
+## Step 10: Build the Query Interface
 
 **Who does this:** Engineer, after the ECL has initial content.
 
 **When:** After at least one full worker run has populated the major domain files.
 
-### Option A:  Claude Code with Superpowers (recommended)
+### Option A: Claude Code with Superpowers (recommended)
 
 Give Claude Code access to the ECL repository and ensure Superpowers is installed. The combined setup gives you:
 
@@ -1025,7 +1031,7 @@ If the ECL says to route this question, tell the user who to route to and why.
 If you are designing a solution, follow the brainstorming skill before producing output.
 ```
 
-### Option B:  Direct API query agent
+### Option B: Direct API query agent
 
 A lightweight Python script that:
 
@@ -1036,7 +1042,7 @@ A lightweight Python script that:
 
 Sufficient for most use cases. No vector database required for ECL repositories up to ~10,000 files.
 
-### Option C:  Full RAG pipeline
+### Option C: Full RAG pipeline
 
 For large ECLs (>10,000 files) or high query volume:
 
@@ -1061,7 +1067,7 @@ Regardless of option chosen:
 
 ## 17. Citation Rules
 
-Citations are the single most important quality control mechanism in the ECL. An agent writing without citations produces confident-sounding content with no traceability;  harder to challenge and correct than a blank file.
+Citations are the single most important quality control mechanism in the ECL. An agent writing without citations produces confident-sounding content with no traceability; harder to challenge and correct than a blank file.
 
 ### Mandatory citation format
 
@@ -1099,7 +1105,8 @@ with EMEA deals typically discounted 15–20%
 For high-confidence claims, require three independent sources. Note the corroboration:
 
 ```markdown
-> **Confidence: HIGH**;  corroborated by three independent sources:
+> **Confidence: HIGH**; corroborated by three independent sources:
+>
 > 1. [[Source A]](path): description
 > 2. [[Source B]](path): description
 > 3. [[Source C]](path): description
@@ -1146,7 +1153,7 @@ An agent should add a backlink whenever it encounters:
 
 ### Why `how-to-get-accurate-information.md` is grown, not written
 
-The source reliability guide starts empty because invented reliability wisdom is worse than none. Over thousands of agent runs, this file accumulates the distilled experience of the entire agent fleet;  including experience with which Superpowers skills worked well for which ECL task types.
+The source reliability guide starts empty because invented reliability wisdom is worse than none. Over thousands of agent runs, this file accumulates the distilled experience of the entire agent fleet; including experience with which Superpowers skills worked well for which ECL task types.
 
 ### Conflict resolution protocol
 
@@ -1156,12 +1163,12 @@ When a conflict is found between sources:
 
 **Step 2: Assess severity.**
 
-| Severity | Definition | Action |
-|----------|-----------|--------|
+| Severity | Definition                                          | Action                                         |
+| -------- | --------------------------------------------------- | ---------------------------------------------- |
 | Critical | Conflict creates legal, security, or financial risk | Priority-1 task; flag domain owner immediately |
-| High | Conflict affects customer-facing answers | Priority-2 task; add routing rule |
-| Medium | Conflict affects internal process | Priority-4 task |
-| Low | Minor inconsistency | Log in mapping-notes; priority-6 task |
+| High     | Conflict affects customer-facing answers            | Priority-2 task; add routing rule              |
+| Medium   | Conflict affects internal process                   | Priority-4 task                                |
+| Low      | Minor inconsistency                                 | Log in mapping-notes; priority-6 task          |
 
 **Step 3: Escalate to domain owner if unresolved after threshold.** Critical/High: 24 hours. Medium: 14 days. Low: 30 days.
 
@@ -1182,12 +1189,12 @@ The ECL architecture scales horizontally with no changes to the core design.
 
 ### Recommended agent counts by ECL state
 
-| ECL phase | Recommended workers | Rationale |
-|-----------|-------------------|-----------|
-| Initial seeding | 1 | Keep git history clean; easy to debug |
-| First population (domains 1–3) | 3–5 | Enough to parallelise without overloading sources |
-| Full population (all domains) | 10–20 | Matches Andy Chen's production setup |
-| Maintenance mode | 2–5 | Most tasks are verify/backlink/skill-verify; lower parallelism needed |
+| ECL phase                      | Recommended workers | Rationale                                                             |
+| ------------------------------ | ------------------- | --------------------------------------------------------------------- |
+| Initial seeding                | 1                   | Keep git history clean; easy to debug                                 |
+| First population (domains 1–3) | 3–5                 | Enough to parallelise without overloading sources                     |
+| Full population (all domains)  | 10–20               | Matches Andy Chen's production setup                                  |
+| Maintenance mode               | 2–5                 | Most tasks are verify/backlink/skill-verify; lower parallelism needed |
 
 ### Token cost management
 
@@ -1219,7 +1226,7 @@ done
 - For people and org-related content
 - For legal, security, and compliance content
 - Periodically for the highest-traffic topics
-- **When a Superpowers skill is first created or substantially revised**;  skills encode team processes; humans must confirm the encoding is accurate before agents follow it
+- **When a Superpowers skill is first created or substantially revised**; skills encode team processes; humans must confirm the encoding is accurate before agents follow it
 
 ### Human review workflow
 
@@ -1243,12 +1250,12 @@ done
 
 ### Sensitivity tiers
 
-| Tier | Examples | Access |
-|------|---------|--------|
-| Public | Product docs, public pricing, competitive intel | All agents and users |
-| Internal | Process docs, org structure, internal pricing | Internal employees only |
-| Restricted | Personnel files, legal matters in dispute, M&A activity | Named roles only |
-| Confidential | Board materials, acquisition targets, personal performance data | Not in the ECL |
+| Tier         | Examples                                                        | Access                  |
+| ------------ | --------------------------------------------------------------- | ----------------------- |
+| Public       | Product docs, public pricing, competitive intel                 | All agents and users    |
+| Internal     | Process docs, org structure, internal pricing                   | Internal employees only |
+| Restricted   | Personnel files, legal matters in dispute, M&A activity         | Named roles only        |
+| Confidential | Board materials, acquisition targets, personal performance data | Not in the ECL          |
 
 ### Implementation approach
 
@@ -1297,16 +1304,16 @@ Drift occurs when the real world changes but the ECL does not. Sources of drift:
 
 ### What you customise per company
 
-| Element | How to customise |
-|---------|-----------------|
-| Domain names and structure | Step 1; discover from org chart and common questions |
-| Source systems | Step 2; map to your actual tooling |
-| Source authority table | Step 3; must reflect your specific sources |
-| Staleness SLAs | Step 9; adjust to your industry's pace of change |
-| Sensitivity tiers | Step 22; adjust to your compliance requirements |
-| Agent tools | Match to your available integrations |
-| Superpowers skills | Step 11.3; encode workflows most critical to your team |
-| Routing rules | Highly company-specific |
+| Element                    | How to customise                                       |
+| -------------------------- | ------------------------------------------------------ |
+| Domain names and structure | Step 1; discover from org chart and common questions   |
+| Source systems             | Step 2; map to your actual tooling                     |
+| Source authority table     | Step 3; must reflect your specific sources             |
+| Staleness SLAs             | Step 9; adjust to your industry's pace of change       |
+| Sensitivity tiers          | Step 22; adjust to your compliance requirements        |
+| Agent tools                | Match to your available integrations                   |
+| Superpowers skills         | Step 11.3; encode workflows most critical to your team |
+| Routing rules              | Highly company-specific                                |
 
 ### Questions to ask a human before building
 
@@ -1333,39 +1340,39 @@ Drift occurs when the real world changes but the ECL does not. Sources of drift:
 
 **The ECL is not a code execution engine.** Superpowers provides agent execution discipline; the ECL provides the knowledge those agents run on. They are not the same system, even when used together.
 
-**The ECL is not finished.** It is never finished. The target state is not "ECL is complete";  it is "ECL is continuously maintained."
+**The ECL is not finished.** It is never finished. The target state is not "ECL is complete"; it is "ECL is continuously maintained."
 
 ---
 
 ## 26. Glossary
 
-| Term | Definition |
-|------|-----------|
-| **ECL** | Enterprise Context Layer; the git repo that encodes how the company actually works |
-| **Domain** | A coherent area of company knowledge with clear ownership; maps to one `domains/` subfolder |
-| **Synthesis** | Reading multiple sources and writing a cited, conflict-aware summary; the core operation of the ECL |
-| **Retrieval** | Finding the best matching document for a query; what search engines do; the ECL is not retrieval |
-| **Inline citation** | A Markdown link within a claim that traces it to a primary source: `[[desc]](path)` |
-| **Conflict note** | An ECL entry documenting that two sources disagree, naming both, and identifying who should resolve it |
-| **Routing note** | An ECL entry that says "do not answer this directly; route to X because Y" |
-| **Mapping notes** | The per-domain log appended after every agent run: timestamps, sources, claims written, conflicts found |
-| **Backlink** | A Markdown cross-reference from one domain file to a related file in another domain |
-| **Context graph** | The web of backlinks across all ECL files; the ECL's plain-text knowledge graph |
-| **C-Compiler pattern** | Anthropic's file-based distributed locking: tasks are YAML files; claiming one means writing a `.LOCKED` sidecar and pushing to git |
-| **Task** | A YAML file in `tasks/` representing one unit of work for a worker agent |
-| **Worker agent** | An LLM agent running the claim → execute → release loop |
-| **Maintenance agent** | A separate agent that scans the ECL for staleness, gaps, and conflicts, and creates tasks for workers to fix them |
-| **Superpowers** | An agentic skills framework by Jesse Vincent; provides composable `SKILL.md` files that agents load and follow |
-| **Skill (Superpowers)** | A `SKILL.md` file describing a mandatory workflow for a specific task type; agents check for relevant skills before non-trivial actions |
-| **Skill domain** | The `domains/skills/` folder in the ECL; stores team workflows as Superpowers-compatible SKILL.md files |
-| **ECL grounding** | Reading ECL domain files before a Superpowers agent brainstorms or plans, to anchor design in real architecture and conventions |
-| **Staleness SLA** | The maximum age of an ECL claim before it should be re-verified; varies by claim type |
-| **Drift** | The ECL was correct when written but the world has changed; different from a conflict |
-| **Tribal knowledge** | Institutional memory held by individuals; not written down; the ECL's most valuable and most difficult target |
-| **`how-to-get-accurate-information.md`** | The key meta seed file; starts empty; agents fill it with source-reliability and skill-effectiveness observations from real experience |
-| **Source authority** | The hierarchy determining which source wins when sources conflict; defined per domain in Step 3 |
-| **Three-source corroboration** | The threshold for high-confidence claims: three independent sources must agree |
-| **Lock TTL** | The time after which a `.LOCKED` file is considered stale and can be reclaimed; default 10 minutes |
+| Term                                     | Definition                                                                                                                              |
+| ---------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| **ECL**                                  | Enterprise Context Layer; the git repo that encodes how the company actually works                                                      |
+| **Domain**                               | A coherent area of company knowledge with clear ownership; maps to one `domains/` subfolder                                             |
+| **Synthesis**                            | Reading multiple sources and writing a cited, conflict-aware summary; the core operation of the ECL                                     |
+| **Retrieval**                            | Finding the best matching document for a query; what search engines do; the ECL is not retrieval                                        |
+| **Inline citation**                      | A Markdown link within a claim that traces it to a primary source: `[[desc]](path)`                                                     |
+| **Conflict note**                        | An ECL entry documenting that two sources disagree, naming both, and identifying who should resolve it                                  |
+| **Routing note**                         | An ECL entry that says "do not answer this directly; route to X because Y"                                                              |
+| **Mapping notes**                        | The per-domain log appended after every agent run: timestamps, sources, claims written, conflicts found                                 |
+| **Backlink**                             | A Markdown cross-reference from one domain file to a related file in another domain                                                     |
+| **Context graph**                        | The web of backlinks across all ECL files; the ECL's plain-text knowledge graph                                                         |
+| **C-Compiler pattern**                   | Anthropic's file-based distributed locking: tasks are YAML files; claiming one means writing a `.LOCKED` sidecar and pushing to git     |
+| **Task**                                 | A YAML file in `tasks/` representing one unit of work for a worker agent                                                                |
+| **Worker agent**                         | An LLM agent running the claim → execute → release loop                                                                                 |
+| **Maintenance agent**                    | A separate agent that scans the ECL for staleness, gaps, and conflicts, and creates tasks for workers to fix them                       |
+| **Superpowers**                          | An agentic skills framework by Jesse Vincent; provides composable `SKILL.md` files that agents load and follow                          |
+| **Skill (Superpowers)**                  | A `SKILL.md` file describing a mandatory workflow for a specific task type; agents check for relevant skills before non-trivial actions |
+| **Skill domain**                         | The `domains/skills/` folder in the ECL; stores team workflows as Superpowers-compatible SKILL.md files                                 |
+| **ECL grounding**                        | Reading ECL domain files before a Superpowers agent brainstorms or plans, to anchor design in real architecture and conventions         |
+| **Staleness SLA**                        | The maximum age of an ECL claim before it should be re-verified; varies by claim type                                                   |
+| **Drift**                                | The ECL was correct when written but the world has changed; different from a conflict                                                   |
+| **Tribal knowledge**                     | Institutional memory held by individuals; not written down; the ECL's most valuable and most difficult target                           |
+| **`how-to-get-accurate-information.md`** | The key meta seed file; starts empty; agents fill it with source-reliability and skill-effectiveness observations from real experience  |
+| **Source authority**                     | The hierarchy determining which source wins when sources conflict; defined per domain in Step 3                                         |
+| **Three-source corroboration**           | The threshold for high-confidence claims: three independent sources must agree                                                          |
+| **Lock TTL**                             | The time after which a `.LOCKED` file is considered stale and can be reclaimed; default 10 minutes                                      |
 
 ---
 
@@ -1380,8 +1387,8 @@ An LLM agent starting a new ECL from scratch should complete these steps in orde
 - **Step 5:** Human review of system prompt
 - **Step 11.1:** Install Superpowers on the primary agent (Claude Code plugin or equivalent)
 - **Step 11.3:** Create stub `SKILL.md` files for the team's highest-priority workflows in `domains/skills/`
-- **Step 6:** Implement task system (YAML schema, locking protocol, priority levels, `skill-verify` task kind);  use Superpowers' brainstorm + write-plan + TDD workflow
-- **Step 7:** Implement worker loop (pull → read skill → claim → execute → release → sleep);  use Superpowers' TDD + subagent execution
+- **Step 6:** Implement task system (YAML schema, locking protocol, priority levels, `skill-verify` task kind); use Superpowers' brainstorm + write-plan + TDD workflow
+- **Step 7:** Implement worker loop (pull → read skill → claim → execute → release → sleep); use Superpowers' TDD + subagent execution
 - **Step 8:** Seed existing docs, domain READMEs, source snapshots, and initial skill stubs
 - **Step 9:** Start maintenance agent; define staleness SLAs including 30-day SLA for skills
 - **Step 10:** Build query interface (start with Claude Code + Superpowers; migrate later if needed)
@@ -1389,4 +1396,4 @@ An LLM agent starting a new ECL from scratch should complete these steps in orde
 
 ---
 
-*Based on Andy Chen's [The Enterprise Context Layer](https://andychen32.substack.com/p/the-enterprise-context-layer), Anthropic's [Building a C Compiler](https://www.anthropic.com/engineering/building-c-compiler), and Jesse Vincent's [Superpowers](https://github.com/obra/superpowers).*
+_Based on Andy Chen's [The Enterprise Context Layer](https://andychen32.substack.com/p/the-enterprise-context-layer), Anthropic's [Building a C Compiler](https://www.anthropic.com/engineering/building-c-compiler), and Jesse Vincent's [Superpowers](https://github.com/obra/superpowers)._

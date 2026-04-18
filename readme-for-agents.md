@@ -1,7 +1,6 @@
-# Enterprise Context Layer (ECL)
+# Enterprise Context Layer (ECL) — Build Specification for LLM Agents
 
-> _"The central intelligence that encompasses all knowledge for your company — able to answer any question, self-updating, built from ~1000 lines of Python and a Git repo."_
-> — Andy Chen, [The Enterprise Context Layer](https://andychen32.substack.com/p/the-enterprise-context-layer)
+> Andy Chen built the first production ECL at Abnormal Security: a living Git repository that encodes how a company actually works — synthesised from primary sources, inline-cited, conflict-documented — maintained autonomously by parallel LLM agents. Read his essay: [The Enterprise Context Layer](https://andychen32.substack.com/p/the-enterprise-context-layer).
 
 ---
 
@@ -9,19 +8,19 @@
 
 **You are the builder.** This document is your complete specification. Read it fully before writing a single file. Then execute the [Quick-Start Checklist](#quick-start-checklist) in order.
 
-**What you are building:** A living Git repository that encodes how a company actually works — its processes, decisions, conflicts, and routing rules — synthesised from raw sources with inline citations. It is not a search engine. It is not a document store. It is institutional memory.
+**What you are building:** A living Git repository that encodes how a company actually works (its processes, decisions, conflicts, and routing rules), all synthesised from raw sources with inline citations. It is not a search engine. It is not a document store. It is institutional memory.
 
 **How this document works:**
 
 1. Sections 1–4 are concepts you must internalise before acting.
-2. Steps 1–10 are ordered build instructions. Follow them in sequence.
+2. Steps 1–9 are ordered build instructions. Follow them in sequence.
 3. Each step specifies its **inputs**, **actions**, and **definition of done**.
 4. Code blocks are implementation-ready. Use them directly.
 
 **Three design patterns underpin everything:**
 
 - **ECL Pattern (Andy Chen):** Synthesis over retrieval. Folder structure as taxonomy. Backlinks as context graph.
-- **C-Compiler Pattern (Anthropic):** Git push-rejection as a distributed mutex. No coordinator service needed.
+- **C-Compiler Pattern (Nicholas Carlini, Anthropic):** Git push-rejection as a distributed mutex. No coordinator service needed.
 - **Superpowers Pattern (Jesse Vincent):** `SKILL.md` files as mandatory agent workflows. Load the skill before the task.
 
 **Start here →** [Quick-Start Checklist](#quick-start-checklist)
@@ -84,9 +83,9 @@ with EMEA deals typically discounted 15–20%
 [[Gong: Call #2847, @james.r, 2026-02-14]](../sources/calls/call-2847.md).
 ```
 
-If you cannot cite a claim, do not make it. An unsourced assertion is more dangerous than a gap — it creates false confidence.
+If you cannot cite a claim, do not make it. An unsourced assertion is more dangerous than a gap — it creates false confidence with no traceability.
 
-### 1.3 Document Conflicts; Never Silently Resolve Them
+### 1.3 Document Conflicts — Never Silently Resolve Them
 
 When two sources disagree, write a conflict note. Do not pick a winner.
 
@@ -141,7 +140,7 @@ Every ECL file must include a `last_verified` front-matter field.
 │  3. Claim a task (file-based distributed lock via git push)              │
 │  4. Execute: read skill → read sources → synthesise → write citations    │
 │  5. Commit with inline citations + update mapping-notes.md               │
-│  6. Push to main → release lock                                          │
+│  6. Delete lock + task YAML → push to main                               │
 └────────────────────────────┬─────────────────────────────────────────────┘
                              │  read / write
                              ▼
@@ -175,7 +174,9 @@ Initialise this exact structure. Domain folder names vary by company; the top-le
 ```
 ecl-repo/
 │
-├── README.md                                  ← This document
+├── README.md                                  ← Human-facing overview
+├── readme-for-agents.md                       ← This document
+├── readme-for-humans.md                       ← Conceptual background
 │
 ├── meta/
 │   ├── system-prompt.md                       ← Agent identity, rules, data model
@@ -323,7 +324,7 @@ Record these verbatim in `meta/system-prompt.md`:
 
 1. **Operational reality beats documented ideal.** Source code shows what a system _does_. A Confluence page shows what someone _intended_.
 2. **Recent specific beats old general.** A Jira ticket from last week beats a two-year-old architecture doc.
-3. **Three-source corroboration = high confidence.** Three independent sources agreeing on a claim crosses the threshold.
+3. **Three-source corroboration = high confidence.** Three independent sources agreeing on a claim crosses the threshold. Five Slack messages from the same channel are one data point, not five.
 4. **People signals have short half-lives.** Any people/role claim must include a `last_verified` date. Distrust claims older than 90 days without re-verification.
 5. **Sensitive questions get documented, not answered.** Legal liability, data privacy timelines, security architecture, pricing exceptions, executive commitments — these are routing entries, not answers.
 
@@ -378,7 +379,7 @@ workflows, not suggestions.
 Required lookups:
 
 - Synthesising a complex or cross-domain topic → load `brainstorming` skill
-- Writing or modifying ECL tooling code → load `writing-plans` + `tdd` skill
+- Writing or modifying ECL tooling code → load `writing-plans` + `subagent-driven-development` skill
 - Pushing a large synthesise batch → load `requesting-code-review` skill
 - Unexpected or contradictory source results → load `systematic-debugging` skill
 
@@ -396,7 +397,6 @@ Required lookups:
 ```markdown
 Claim text [[Source: description, date/version]](relative/path/to/source.md).
 ```
-````
 
 ## Conflict Note Format
 
@@ -431,12 +431,11 @@ Unresolved as of [DATE]. See [[Routing Rules]](path/to/routing.md).
 ## Available Tools
 
 [List the specific integrations this agent has access to]
-
 ````
 
 ### 4.2 `meta/how-to-get-accurate-information.md`
 
-**Do not pre-fill this file with invented wisdom.** Seed it with the empty template below and let agents build it from real experience. Invented reliability wisdom is worse than none.
+**Do not pre-fill this file with invented wisdom.** Seed it with the empty template below and let agents build it from real experience. Invented reliability wisdom encodes your biases and blind spots; experience accumulated by agents is the point.
 
 ```markdown
 # How to Get Accurate Information
@@ -468,13 +467,13 @@ Reason: what you found. Citation: [[source]](path). -->
 <!-- Which skills proved most useful for which task types?
      Which tasks went wrong before a skill was added?
      Format same as above: [DATE] [AGENT_ID] [Skill]: Observation. -->
-````
+```
 
 ### 4.3 `meta/domain-index.md`
 
 Use the completed output from Step 1.
 
-**Done when:** All three meta files exist and are committed to the repository. A human has reviewed `meta/system-prompt.md` and confirmed it is accurate.
+**Done when:** All three meta files exist and are committed to the repository. A human has reviewed `meta/system-prompt.md` and confirmed it is accurate for their company.
 
 ---
 
@@ -482,6 +481,8 @@ Use the completed output from Step 1.
 
 **Inputs:** Initialised repository with meta files.
 **Goal:** Implement the YAML task queue and file-based distributed locking.
+
+**Before writing code:** If Superpowers is available, load the `writing-plans` and `subagent-driven-development` skills. Implement with RED → GREEN → REFACTOR on every function.
 
 ### Task file schema
 
@@ -639,7 +640,7 @@ def release_task(task: dict, success: bool = True):
 **Inputs:** Implemented task system (Step 5). `meta/` files populated (Step 4).
 **Goal:** A running agent process that claims tasks, executes them, and releases them.
 
-**Before writing code:** If Superpowers is available, load the `writing-plans` and `tdd` skills. Implement with RED → GREEN → REFACTOR on every function.
+**Before writing code:** Load the `writing-plans` and `subagent-driven-development` skills. Implement with RED → GREEN → REFACTOR on every function.
 
 ### Complete worker loop
 
@@ -683,6 +684,7 @@ def execute_synthesise(task: dict):
     domain_readme = Path(f"domains/{domain}/README.md").read_text()
 
     # 2. If task specifies a skill, load and follow it
+    skill_content = None
     if skill_path and Path(skill_path).exists():
         skill_content = Path(skill_path).read_text()
         # Pass skill_content to the LLM as an additional instruction block
@@ -699,7 +701,7 @@ def execute_synthesise(task: dict):
         system_prompt=system_prompt,
         source_guide=source_guide,
         domain_readme=domain_readme,
-        skill_content=skill_content if skill_path else None,
+        skill_content=skill_content,
         sources=sources,
         task=task
     )
@@ -953,7 +955,8 @@ def maintenance_scan():
             continue
 
         # Check 2: Any topic files missing entirely?
-        if not any(domain_dir.glob("*.md")) or list(domain_dir.glob("*.md")) == [domain_dir / "README.md"]:
+        topic_files = [f for f in domain_dir.glob("*.md") if f.name != "README.md"]
+        if not topic_files:
             t = create_task(domain, "synthesise",
                             f"Domain {domain} has no topic files",
                             priority=2, target_file=f"domains/{domain}/README.md")
@@ -965,9 +968,7 @@ def maintenance_scan():
                 continue
             lv = get_last_verified(md_file)
             if lv is None:
-                continue  # No front matter — synthesise tasks should handle this
-
-            # Determine claim type from file name or front matter tags (simplified)
+                continue  # No front matter — synthesise tasks handle this
             sla = STALENESS_SLA.get("process")  # Default SLA
             if sla and (now - lv) > sla:
                 t = create_task(domain, "verify",
@@ -990,7 +991,6 @@ def maintenance_scan():
         for md_file in domain_dir.glob("*.md"):
             content = md_file.read_text()
             if "⚠️ Conflict" in content and "RESOLVED" not in content:
-                # Extract conflict date from content (implement parsing as needed)
                 t = create_task(domain, "conflict-review",
                                 f"Unresolved conflict in {md_file}",
                                 priority=3, target_file=str(md_file))
@@ -1023,7 +1023,7 @@ def maintenance_scan():
 | Technical architecture              | 90 days     |
 | Historical analysis                 | Never       |
 
-**Done when:** Maintenance agent runs without error, creates tasks for all three scan types (staleness, missing mapping-notes, stale skills), and commits them to `tasks/`.
+**Done when:** Maintenance agent runs without error, creates tasks for all scan types (staleness, missing mapping-notes, stale skills, unresolved conflicts), and commits them to `tasks/`.
 
 ---
 
@@ -1034,7 +1034,13 @@ def maintenance_scan():
 
 ### Option A — Claude Code + Superpowers (recommended)
 
-Give Claude Code access to the ECL repository. Use this system prompt:
+Give Claude Code access to the ECL repository. Install Superpowers if not already installed:
+
+```bash
+/plugin install superpowers@claude-plugins-official
+```
+
+Use this system prompt for queries:
 
 ```
 You are answering questions using the Enterprise Context Layer in this repository.
@@ -1083,6 +1089,8 @@ if __name__ == "__main__":
     print(query_ecl(" ".join(sys.argv[1:])))
 ```
 
+**Note:** ripgrep finds keyword matches — it does not preferentially surface routing rules and conflict notes. Option B is useful for exploration; for production use where conflict surfacing matters, prefer Option A or build a proper retrieval layer.
+
 ### Option C — Full RAG pipeline
 
 Use only when the ECL exceeds ~10,000 files or query volume demands it. Chunk by section (not arbitrary token count). Re-embed incrementally on each ECL commit.
@@ -1108,17 +1116,10 @@ Regardless of option:
 ### Install Superpowers (Claude Code)
 
 ```bash
-/plugin marketplace add obra/superpowers-marketplace
-/plugin install superpowers@superpowers-marketplace
+/plugin install superpowers@claude-plugins-official
 ```
 
-Verify:
-
-```
-/superpowers:brainstorm
-/superpowers:write-plan
-/superpowers:execute-plan
-```
+Verify by asking Claude Code to brainstorm a feature — the `brainstorming` skill should activate automatically.
 
 ### Integration Point 1 — ECL as Agent Grounding
 
@@ -1149,16 +1150,16 @@ Team workflows stored as `SKILL.md` files in `domains/skills/` become first-clas
 - Skills can cross-reference ECL knowledge (`closing-a-deal` links to `domains/gtm/pricing-authority.md`)
 - The maintenance agent creates `skill-verify` tasks when skills go stale
 
-**When a skill is first created or substantially revised, a human must review it** before agents are instructed to follow it. Record this in `mapping-notes.md`.
+**When a skill is first created or substantially revised, a human must review it** before agents are instructed to follow it. Record this review in `mapping-notes.md`.
 
 ### Integration Point 3 — Superpowers as the ECL Build Methodology
 
-When building or extending any ECL tooling (runner, worker, query interface):
+When building or extending any ECL tooling (runner, worker, query interface), use the Superpowers workflow:
 
 ```
-1. /superpowers:brainstorm    ← Read ECL meta/ files first; refine design
-2. /superpowers:write-plan    ← Break into 2–5 minute TDD tasks with file paths and assertions
-3. /superpowers:execute-plan  ← RED → GREEN → REFACTOR per task; two-stage review after each
+1. brainstorming skill        ← Read ECL meta/ files first; refine design through questions
+2. writing-plans skill        ← Break into 2–5 minute TDD tasks with file paths and assertions
+3. subagent-driven-development ← RED → GREEN → REFACTOR per task; two-stage review after each
 4. requesting-code-review     ← After each batch; critical issues block progress
 5. finishing-a-development-branch ← Verify all tests pass; present merge/discard options
 ```
@@ -1177,7 +1178,7 @@ When building or extending any ECL tooling (runner, worker, query interface):
 
 ## Citation Rules
 
-Citations are the single most important quality control mechanism. An agent writing without citations produces confident-sounding content with no traceability.
+Citations are the single most important quality control mechanism. An agent writing without citations produces confident-sounding content with no traceability — and no way for the next agent to verify or correct it.
 
 ### Mandatory format
 
@@ -1324,7 +1325,7 @@ done
 ### Implementation
 
 1. **Folder-based tiers.** Restricted content goes in `domains/restricted/`. Enforce via repo permissions.
-2. **Separate repositories.** For truly sensitive domains, maintain a separate restricted ECL repo with tighter access controls.
+2. **Separate repositories.** For truly sensitive domains, maintain a separate restricted ECL repo with its own access controls. Note: cross-repo backlinks are not possible, so this breaks the context graph for those topics. Prefer routing notes for Confidential content over a separate repo unless compliance requires it.
 3. **Routing over content.** For Confidential topics, store a routing note — not the content itself.
 
 ---
@@ -1338,8 +1339,8 @@ Execute in order. Do not skip steps.
 - [ ] **Step 3** — Write domain-specific source authority tables; define conflict resolution hierarchy
 - [ ] **Step 4** — Create `meta/system-prompt.md` (complete), `meta/how-to-get-accurate-information.md` (empty template only, do not pre-fill)
 - [ ] **Human review** — Have a human review `meta/system-prompt.md` before any agent runs against it
-- [ ] **Superpowers** — Install Superpowers on the primary agent; verify `/superpowers:brainstorm` is available
-- [ ] **Step 5** — Implement task system (YAML schema, `claim_task()`, `release_task()`); use Superpowers write-plan + TDD workflow; achieve 90% coverage on locking logic
+- [ ] **Superpowers** — Install Superpowers: `/plugin install superpowers@claude-plugins-official`
+- [ ] **Step 5** — Implement task system (YAML schema, `claim_task()`, `release_task()`); use Superpowers `writing-plans` + `subagent-driven-development` workflow; achieve 90% coverage on locking logic
 - [ ] **Step 6** — Implement worker loop (`worker_loop()`, `execute_synthesise()`, `execute_skill_verify()`); use TDD + subagent execution
 - [ ] **Step 7** — Seed: domain READMEs, existing docs as source snapshots, org chart, known conflicts, six initial skill stubs in `domains/skills/`
 - [ ] **Step 8** — Start maintenance agent on 6-hour schedule; confirm it creates tasks for staleness, missing mapping-notes, and stale skills
@@ -1350,33 +1351,33 @@ Execute in order. Do not skip steps.
 
 ## Glossary
 
-| Term                                     | Definition                                                                                                              |
-| ---------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
-| **ECL**                                  | Enterprise Context Layer — the git repo that encodes how the company actually works                                     |
-| **Domain**                               | A coherent area of company knowledge with clear ownership; maps to one `domains/` subfolder                             |
-| **Synthesis**                            | Reading multiple sources and writing a cited, conflict-aware summary — the core ECL operation                           |
-| **Retrieval**                            | Finding the best matching document for a query; what search engines do; the ECL is not retrieval                        |
-| **Inline citation**                      | A Markdown link within a claim tracing it to a primary source: `[[desc]](path)`                                         |
-| **Conflict note**                        | An ECL entry documenting that two sources disagree, naming both, identifying who should resolve it                      |
-| **Routing note**                         | An ECL entry that says "do not answer this directly; route to X because Y"                                              |
-| **Mapping notes**                        | The per-domain log appended after every agent run: timestamps, sources read, claims written, conflicts found            |
-| **Backlink**                             | A Markdown cross-reference from one domain file to a related file in another domain                                     |
-| **Context graph**                        | The web of backlinks across all ECL files — the ECL's plain-text knowledge graph                                        |
-| **C-Compiler pattern**                   | File-based distributed locking: tasks are YAML files; claiming one means writing a `.LOCKED` sidecar and pushing to git |
-| **Task**                                 | A YAML file in `tasks/` representing one unit of work for a worker agent                                                |
-| **Worker agent**                         | An LLM agent running the claim → execute → release loop                                                                 |
-| **Maintenance agent**                    | A separate scheduled process that scans for staleness, gaps, and drift, and creates tasks for workers                   |
-| **Superpowers**                          | An agentic skills framework; provides composable `SKILL.md` files that agents load and follow                           |
-| **Skill (Superpowers)**                  | A `SKILL.md` file describing a mandatory workflow for a specific task type                                              |
-| **ECL grounding**                        | Reading ECL domain files before a Superpowers agent brainstorms or plans — anchors design in real architecture          |
-| **Staleness SLA**                        | Maximum age of an ECL claim before re-verification is required; varies by claim type                                    |
-| **Drift**                                | The ECL was correct when written but the world has since changed                                                        |
-| **Tribal knowledge**                     | Institutional memory held by individuals, not written down — the ECL's most valuable and hardest target                 |
-| **`how-to-get-accurate-information.md`** | The key meta seed file; starts empty; agents fill it with source-reliability observations from real experience          |
-| **Source authority**                     | The hierarchy determining which source wins when sources conflict; defined per domain in Step 3                         |
-| **Three-source corroboration**           | Threshold for high-confidence claims: three independent sources must agree                                              |
-| **Lock TTL**                             | Time after which a `.LOCKED` file is considered stale and may be reclaimed; default 10 minutes                          |
+| Term                                     | Definition                                                                                                                              |
+| ---------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| **ECL**                                  | Enterprise Context Layer — the git repo that encodes how the company actually works                                                     |
+| **Domain**                               | A coherent area of company knowledge with clear ownership; maps to one `domains/` subfolder                                             |
+| **Synthesis**                            | Reading multiple sources and writing a cited, conflict-aware summary — the core ECL operation                                           |
+| **Retrieval**                            | Finding the best matching document for a query; what search engines do; the ECL is not retrieval                                        |
+| **Inline citation**                      | A Markdown link within a claim tracing it to a primary source: `[[desc]](path)`                                                         |
+| **Conflict note**                        | An ECL entry documenting that two sources disagree, naming both, identifying who should resolve it                                      |
+| **Routing note**                         | An ECL entry that says "do not answer this directly; route to X because Y"                                                              |
+| **Mapping notes**                        | The per-domain log appended after every agent run: timestamps, sources read, claims written, conflicts found                            |
+| **Backlink**                             | A Markdown cross-reference from one domain file to a related file in another domain                                                     |
+| **Context graph**                        | The web of backlinks across all ECL files — the ECL's plain-text knowledge graph                                                        |
+| **C-Compiler pattern**                   | File-based distributed locking: tasks are YAML files; claiming one means writing a `.LOCKED` sidecar and pushing to git                 |
+| **Task**                                 | A YAML file in `tasks/` representing one unit of work for a worker agent                                                                |
+| **Worker agent**                         | An LLM agent running the claim → execute → release loop                                                                                 |
+| **Maintenance agent**                    | A separate scheduled process that scans for staleness, gaps, and drift, and creates tasks for workers                                   |
+| **Superpowers**                          | An agentic skills framework by Jesse Vincent; provides composable `SKILL.md` files that agents load and follow                          |
+| **Skill (Superpowers)**                  | A `SKILL.md` file describing a mandatory workflow for a specific task type; agents check for relevant skills before non-trivial actions |
+| **ECL grounding**                        | Reading ECL domain files before a Superpowers agent brainstorms or plans — anchors design in real architecture                          |
+| **Staleness SLA**                        | Maximum age of an ECL claim before re-verification is required; varies by claim type                                                    |
+| **Drift**                                | The ECL was correct when written but the world has since changed                                                                        |
+| **Tribal knowledge**                     | Institutional memory held by individuals, not written down — the ECL's most valuable and hardest target                                 |
+| **`how-to-get-accurate-information.md`** | The key meta seed file; starts empty; agents fill it with source-reliability observations from real experience                          |
+| **Source authority**                     | The hierarchy determining which source wins when sources conflict; defined per domain in Step 3                                         |
+| **Three-source corroboration**           | Threshold for high-confidence claims: three independent sources must agree                                                              |
+| **Lock TTL**                             | Time after which a `.LOCKED` file is considered stale and may be reclaimed; default 10 minutes                                          |
 
 ---
 
-_Based on Andy Chen's [The Enterprise Context Layer](https://andychen32.substack.com/p/the-enterprise-context-layer), Anthropic's [Building a C Compiler](https://www.anthropic.com/engineering/building-c-compiler), and Jesse Vincent's [Superpowers](https://github.com/obra/superpowers)._
+_Based on Andy Chen's [The Enterprise Context Layer](https://andychen32.substack.com/p/the-enterprise-context-layer), Nicholas Carlini's [Building a C Compiler with Parallel Claudes](https://www.anthropic.com/engineering/building-c-compiler), and Jesse Vincent's [Superpowers](https://github.com/obra/superpowers)._
