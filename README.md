@@ -2,7 +2,7 @@
 
 A self-maintaining Git repository that encodes how your company actually works. Not a search engine. Not a chatbot. A living, cited, conflict-aware institutional memory built and kept current by LLM agents running continuously against your real data sources.
 
-Andy Chen, who built the first production ECL at Abnormal Security, described the insight simply: retrieval and synthesis are different problems. Glean finds the best matching document. The ECL builds the reasoning framework an expert uses, and tells you which questions should never be answered at all.
+Andy Chen (@andychen32), who built the first production ECL at Abnormal Security, described the insight simply: retrieval and synthesis are different problems. Glean finds the best matching document. The ECL builds the reasoning framework an expert uses, and tells you which questions should never be answered at all.
 
 ---
 
