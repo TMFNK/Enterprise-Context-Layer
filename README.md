@@ -1,8 +1,5 @@
 # Enterprise Context Layer (ECL)
 
-[![AI Slop Inside](https://sladge.net/badge.svg)](https://sladge.net)
-by [TMFNK](https://x.com/4tmfnk).
-
 A self-maintaining Git repository that encodes how your company actually works. Not a search engine. Not a chatbot. A living, cited, conflict-aware institutional memory built and kept current by LLM agents running continuously against your real data sources.
 
 Andy Chen, who built the first production ECL at Abnormal Security, described the insight simply: retrieval and synthesis are different problems. Glean finds the best matching document. The ECL builds the reasoning framework an expert uses, and tells you which questions should never be answered at all.
@@ -25,9 +22,9 @@ The ECL is a Git repository of Markdown files. LLM agents read your company's so
 
 Three design patterns make this work:
 
-**ECL Pattern** (Andy Chen, [The Enterprise Context Layer](https://andychen32.substack.com/p/the-enterprise-context-layer)): Knowledge is synthesised into Markdown files organised by domain folder. The folder structure is the taxonomy. Backlinks between files are the knowledge graph. No ontology engine, no graph database, just folders and plain text that any LLM reads natively.
+**ECL Pattern** (Andy Chen, [The Enterprise Context Layer](https://andychen32.substack.com/p/the-enterprise-context-layer)): Knowledge is synthesised into Markdown files organised by domain folder. The folder structure is the taxonomy. Backlinks between files are the knowledge graph. No ontology engine, no graph database — just folders and plain text that any LLM reads natively.
 
-**C-Compiler Pattern** (Nicholas Carlini, Anthropic, [Building a C Compiler with Parallel Claudes](https://www.anthropic.com/engineering/building-c-compiler)): Multiple agents coordinate without a central broker. Each task is a YAML file in `tasks/`. An agent claims a task by writing a `.LOCKED` sidecar and pushing to git. If the push is rejected, another agent got there first. Git's push-rejection is the distributed mutex, no message broker, no database, no coordinator.
+**C-Compiler Pattern** (Nicholas Carlini, Anthropic, [Building a C Compiler with Parallel Claudes](https://www.anthropic.com/engineering/building-c-compiler)): Multiple agents coordinate without a central broker. Each task is a YAML file in `tasks/`. An agent claims a task by writing a `.LOCKED` sidecar and pushing to git. If the push is rejected, another agent got there first. Git's push-rejection is the distributed mutex — no message broker, no database, no coordinator.
 
 **Superpowers Pattern** (Jesse Vincent, [Superpowers](https://github.com/obra/superpowers)): Agent quality comes from process discipline, not just prompt quality. Before any non-trivial task, agents load a `SKILL.md` file that defines the mandatory workflow for that task type. Team workflows are themselves stored as skill files inside the ECL, making process a first-class, versioned, citable artifact.
 
@@ -112,7 +109,7 @@ The identity and rules file that every worker agent reads at the start of every 
 
 ### `meta/how-to-get-accurate-information.md`
 
-The most important file in the ECL; and it starts completely empty. You do not pre-fill it. Agents add to it over time as they discover which sources are stale, which tool calls return unreliable results, and which questions should always be escalated. After thousands of agent runs it becomes a dense, experience-grounded guide to navigating your company's specific information landscape. Invented wisdom is worse than none; real experience accumulated by agents is the point.
+The most important file in the ECL — and it starts completely empty. You do not pre-fill it. Agents add to it over time as they discover which sources are stale, which tool calls return unreliable results, and which questions should always be escalated. After thousands of agent runs it becomes a dense, experience-grounded guide to navigating your company's specific information landscape. Invented wisdom is worse than none; real experience accumulated by agents is the point.
 
 ### `meta/domain-index.md`
 
@@ -128,11 +125,11 @@ A synthesised topic file. Every factual claim has an inline citation tracing it 
 
 ### `domains/skills/{name}/SKILL.md`
 
-A Superpowers-compatible workflow file. When an agent encounters a task type that has a corresponding skill (incident response, closing a deal, customer data requests), it loads the skill file and follows the steps as a mandatory workflow, not a suggestion. Skills are maintained like any other ECL content: they have citations, `last_verified` dates, and get flagged for re-verification when the processes they describe change.
+A Superpowers-compatible workflow file. When an agent encounters a task type that has a corresponding skill (incident response, closing a deal, customer data requests), it loads the skill file and follows the steps as a mandatory workflow — not a suggestion. Skills are maintained like any other ECL content: they have citations, `last_verified` dates, and get flagged for re-verification when the processes they describe change.
 
 ### `tasks/*.yaml` and `tasks/*.LOCKED`
 
-The distributed task queue. The maintenance agent creates YAML task files. Worker agents claim them by writing a `.LOCKED` sidecar and pushing to git; if the push is rejected, another agent won the race and this agent moves on. When a task is complete, both files are deleted in a single commit. No message broker, no database, no coordinator, just git. The only distributed lock in the system is git's push rejection is the mutex.
+The distributed task queue. The maintenance agent creates YAML task files. Worker agents claim them by writing a `.LOCKED` sidecar and pushing to git — if the push is rejected, another agent won the race and this agent moves on. When a task is complete, both files are deleted in a single commit. No message broker, no database, no coordinator — git's push rejection is the mutex.
 
 ### `sources/`
 
@@ -277,7 +274,7 @@ Every claim is cited. The conflict was documented and resolved, with the origina
 
 **Not finished.** The target state is not "ECL is complete." It is "ECL is continuously maintained." The maintenance agent and worker loop run indefinitely.
 
-**Not a replacement for experts.** Sensitive questions like legal liability, security architecture, pricing exceptions, are documented as routing notes and not answers. The ECL tells you who to ask. It does not replace asking them.
+**Not a replacement for experts.** Sensitive questions — legal liability, security architecture, pricing exceptions — are documented as routing notes, not answers. The ECL tells you who to ask. It does not replace asking them.
 
 ---
 
@@ -302,7 +299,7 @@ This project is an implementation template synthesising three published ideas:
 - **[Building a C Compiler with Parallel Claudes](https://www.anthropic.com/engineering/building-c-compiler)** — Nicholas Carlini's C-Compiler pattern: file-based distributed locking via git push-rejection, enabling parallel agents with no central broker.
 - **[Superpowers](https://github.com/obra/superpowers)** — Jesse Vincent's agentic skills framework: `SKILL.md` files as mandatory agent workflows, process discipline as a first-class engineering concern.
 
-The 10-step build process, task schema, staleness SLA tables, and repository structure are this project's extrapolation from those sources, one way to implement the pattern and not the only way.
+The 10-step build process, task schema, staleness SLA tables, and repository structure are this project's extrapolation from those sources — one way to implement the pattern, not the only way.
 
 ---
 

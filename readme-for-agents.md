@@ -8,7 +8,7 @@
 
 **You are the builder.** This document is your complete specification. Read it fully before writing a single file. Then execute the [Quick-Start Checklist](#quick-start-checklist) in order.
 
-**What you are building:** A living Git repository that encodes how a company actually works (its processes, decisions, conflicts, and routing rules), all synthesised from raw sources with inline citations. It is not a search engine. It is not a document store. It is institutional memory.
+**What you are building:** A living Git repository that encodes how a company actually works — its processes, decisions, conflicts, and routing rules — synthesised from raw sources with inline citations. It is not a search engine. It is not a document store. It is institutional memory.
 
 **How this document works:**
 
