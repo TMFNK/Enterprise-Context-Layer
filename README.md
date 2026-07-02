@@ -312,6 +312,22 @@ The 10-step build process, task schema, staleness SLA tables, and repository str
 
 ---
 
+## Für deutsche Unternehmen, kurz gefasst
+
+Unternehmenswissen liegt selten an einem Ort: Es steckt in Slack-Threads, Confluence-Seiten, Jira-Tickets und im Kopf einzelner Mitarbeiter, und die Quellen widersprechen sich oft, ohne dass jemand weiß, welche Version stimmt. Der Enterprise Context Layer löst das anders als eine klassische Suche oder ein Chatbot: mehrere LLM-Agenten lesen fortlaufend die echten Quellsysteme und schreiben synthetisiertes, mit Zitaten belegtes Wissen in ein Git-Repository. Widersprüche zwischen Quellen werden dokumentiert statt stillschweigend aufgelöst, sensible Fragen werden an die richtige Stelle weitergeleitet statt beantwortet. Keine Vektordatenbank, keine Ontologie, nur versionierte Markdown-Dateien, die jedes LLM nativ lesen kann und jeder Mitarbeiter mit `git clone` einsehen kann.
+
+Beratung und Umsetzung: [mbitai.com](https://www.mbitai.com).
+
+---
+
+## About
+
+Built by [mbitai](https://www.mbitai.com), freelance data and AI engineering for German businesses, with a focus on practical, privacy-first machine learning that runs where your data already lives. The Enterprise Context Layer is part of that portfolio.
+
+Want to apply this to your own institutional knowledge, data or AI engineering work? Get in touch at [www.mbitai.com](https://www.mbitai.com).
+
+---
+
 ## Licence
 
 GPL-3.0: free for all uses, but improvements must be contributed back to the community.
