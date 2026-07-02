@@ -615,6 +615,7 @@ ECL skills don't depend on installing an external framework. A skill is a folder
 ```markdown
 ---
 name: incident-response
+description: "What the skill does and the trigger phrases that should load it"
 last_verified: YYYY-MM-DD
 owner: "@owner"
 when_to_use: "trigger phrases or task types that should load this skill"
@@ -646,6 +647,8 @@ If [condition], route to [person/team]. See [[Routing rules]](../../domains/gtm/
 ```
 
 A skill is a mandatory workflow once it's loaded, not a suggestion, but it stays scoped to one task type and never chains automatically into other skills. Verify the pattern is working by confirming an agent checks `domains/skills/` before a non-trivial task; no plugin marketplace or external package is required.
+
+Because the `name` + `description` frontmatter pair follows the Agent Skills convention, harnesses that support it can also discover ECL skills natively: [Pi](https://pi.dev/), for example, loads them via a `skills` entry in its settings (`{"skills": ["domains/skills"]}`) or a repeatable `--skill <path>` flag. That turns the mandatory-lookup rule from a prompt instruction into harness-enforced behaviour.
 
 ### 11.2 Integration Point 1: ECL as Agent Grounding
 
@@ -791,7 +794,7 @@ metadata:
 | -------- | ---------------------------------------------------------------------- |
 | 1        | Drift detected; immediate re-verification needed                       |
 | 2        | Topic file or skill missing entirely                                   |
-| 3        | Proof/verification file missing                                        |
+| 3        | Referenced content has drifted; update needed                          |
 | 4        | Stale content (>7 days for status claims; >30 days for process claims) |
 | 5        | Default / routine                                                      |
 | 6        | Low-priority enrichment (backlinks, deduplication)                     |
@@ -808,10 +811,13 @@ def claim_task(repo):
     2. Sort tasks by (priority ASC, created_at ASC)
     3. For each task:
        a. If .LOCKED exists and is fresh (< LOCK_TTL): skip
+          (age is measured from the locked_at timestamp inside the lock file,
+          not file mtime — mtime resets to pull time on every `git pull`)
        b. If .LOCKED exists and is stale (>= LOCK_TTL): reclaim (log warning)
        c. Write .LOCKED with {agent: AGENT_ID, locked_at: timestamp}
        d. Push to git; if push succeeds: this agent owns the task
-          If push fails (race condition): delete local .LOCKED, try next task
+          If push fails (race condition): discard the local claim commit
+          (git fetch + git reset --hard origin/main), try next task
     4. Return claimed task, or None if queue is empty
     """
 ```
@@ -823,6 +829,8 @@ def claim_task(repo):
 **Who does this:** Engineer writing the runner script.
 
 **When:** Alongside the task system implementation. Think before coding, then use TDD (RED → GREEN → REFACTOR) to implement this component.
+
+> **Implementation note:** the task-execution step (5 below) is best delegated to an agent harness in headless mode — e.g. [Pi](https://pi.dev/) via `pi --mode json "<prompt>"` or Claude Code via `claude -p` — rather than raw LLM API calls. The harness brings file and shell tools, so the agent reads sources and writes ECL files itself; the runner's Python stays limited to the queue, locking, and git.
 
 The worker loop is the core execution engine:
 
@@ -991,7 +999,7 @@ Global checks:
 
 ### Option A: Claude Code (recommended)
 
-Give Claude Code access to the ECL repository. This gives you:
+Give Claude Code access to the ECL repository. Any agent harness with file-system access works the same way — [Pi](https://pi.dev/) is a good multi-model alternative that reads the repo's `AGENTS.md` and can load `domains/skills/` natively. This gives you:
 
 - **ECL for grounding:** The agent reads ECL domain files to anchor its answers in cited company knowledge.
 - **Lean skills for discipline:** The agent checks `domains/skills/` and follows the matching skill, if one exists, before acting on a task type that has one.
@@ -1182,6 +1190,7 @@ The ECL architecture scales horizontally with no changes to the core design.
 2. **Selective source reads:** The `source_hints` field pre-selects which sources to read.
 3. **Staleness tiers:** Not everything needs daily verification.
 4. **Skill-driven efficiency:** Lean skills prevent agents from wasting tokens on ad-hoc approaches to tasks that have well-defined processes.
+5. **Model tiering by task kind:** Run `synthesise` and `conflict-review` on a frontier model; run `verify` and `backlink` on a cheaper one. A multi-model harness such as [Pi](https://pi.dev/) makes this a per-invocation setting rather than provider-specific code.
 
 ### Running agents in parallel
 

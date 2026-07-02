@@ -177,6 +177,7 @@ ecl-repo/
 ├── README.md                                  ← Human-facing overview
 ├── readme-for-agents.md                       ← This document
 ├── readme-for-humans.md                       ← Conceptual background
+├── AGENTS.md                                  ← Harness-level grounding: points every agent session at meta/ and skills
 │
 ├── meta/
 │   ├── system-prompt.md                       ← Agent identity, rules, data model
@@ -473,7 +474,25 @@ Reason: what you found. Citation: [[source]](path). -->
 
 Use the completed output from Step 1.
 
-**Done when:** All three meta files exist and are committed to the repository. A human has reviewed `meta/system-prompt.md` and confirmed it is accurate for their company.
+### 4.4 `AGENTS.md` (repository root)
+
+Agent harnesses (Pi, Claude Code, Codex) automatically load an `AGENTS.md`/`CLAUDE.md` from the project root. Create one that points every session at the ECL's grounding files, so bootstrap, worker, and query sessions are all grounded without per-prompt preambles:
+
+```markdown
+# Agent Instructions
+
+This repository is an Enterprise Context Layer. Before acting on any task:
+
+1. Read meta/system-prompt.md — identity, citation format, non-negotiable rules
+2. Read meta/domain-index.md — knowledge domains, owners, primary sources
+3. Check domains/skills/ for a SKILL.md matching your task type;
+   if one matches, follow it as the mandatory workflow
+
+Every factual claim needs an inline citation. Document conflicts; never
+resolve them silently. Sensitive topics get routing notes, not answers.
+```
+
+**Done when:** All three meta files plus the root `AGENTS.md` exist and are committed to the repository. A human has reviewed `meta/system-prompt.md` and confirmed it is accurate for their company.
 
 ---
 
@@ -570,10 +589,18 @@ def load_tasks() -> list[dict]:
 
 
 def is_lock_stale(lock_path: str) -> bool:
+    # Age is measured from the locked_at timestamp written inside the lock
+    # file, not the filesystem mtime: after any `git pull`, every lock file's
+    # mtime is the pull time on this machine, so mtime-based locks never
+    # look stale to a fresh worker.
     if not os.path.exists(lock_path):
         return False
-    mtime = os.path.getmtime(lock_path)
-    age = time.time() - mtime
+    try:
+        with open(lock_path) as f:
+            locked_at = datetime.fromisoformat(json.load(f)["locked_at"])
+    except (ValueError, KeyError, json.JSONDecodeError):
+        return True  # Malformed lock; safe to reclaim
+    age = (datetime.now(timezone.utc) - locked_at).total_seconds()
     return age >= LOCK_TTL_SECONDS
 
 
@@ -607,9 +634,12 @@ def claim_task(repo_root: str) -> dict | None:
         if git_push():
             return task  # This agent owns the task
         else:
-            # Race condition, another worker pushed first
-            os.remove(lock_path)
-            subprocess.run(["git", "checkout", "HEAD", "--", lock_path], capture_output=True)
+            # Race condition, another worker pushed first. Removing the lock
+            # file alone is not enough: the local claim commit would be
+            # replayed by the next `git pull --rebase` and re-lock a task
+            # another agent owns. Drop the commit and re-sync with remote.
+            subprocess.run(["git", "fetch"], check=True)
+            subprocess.run(["git", "reset", "--hard", "origin/main"], check=True)
             continue  # Try next task
 
     return None  # Queue empty
@@ -767,6 +797,23 @@ def worker_loop(repo_root: str):
 
         time.sleep(2)  # Rate limiting between tasks
 ```
+
+### Implementing `call_llm_synthesise`
+
+Prefer delegating to an agent harness in headless mode over raw LLM API plumbing. A harness brings file read/write and shell tools, so the agent can read `source_hints`, write the target file, and append `mapping-notes.md` itself; the worker's Python then only orchestrates the queue, locking, and git.
+
+Example with [Pi](https://pi.dev/) in JSON event stream mode (`claude -p` works the same way):
+
+```python
+def call_llm_synthesise(system_prompt, source_guide, domain_readme,
+                        skill_content, sources, task) -> str:
+    prompt = build_synthesis_prompt(...)  # assemble from the template below
+    with open(f"logs/run-{task['created_at']}.jsonl", "w") as log:
+        subprocess.run(["pi", "--mode", "json", prompt], check=True, stdout=log)
+    return Path(task["metadata"]["target_file"]).read_text()
+```
+
+The JSON event stream (one JSON object per line) doubles as the run record; commit it under `logs/`. Because the harness is multi-model, the worker can select a different model per task kind — see [Token cost management](#token-cost-management).
 
 ### LLM synthesis prompt template
 
@@ -990,7 +1037,11 @@ def maintenance_scan():
         # Check 5: Unresolved conflicts older than threshold
         for md_file in domain_dir.glob("*.md"):
             content = md_file.read_text()
-            if "⚠️ Conflict" in content and "RESOLVED" not in content:
+            # Check each conflict block, not the whole file: resolutions keep
+            # the original conflict text, so a file holding one RESOLVED
+            # conflict and one new conflict must still be flagged.
+            conflict_blocks = content.split("⚠️ Conflict")[1:]
+            if any("RESOLVED" not in block for block in conflict_blocks):
                 t = create_task(domain, "conflict-review",
                                 f"Unresolved conflict in {md_file}",
                                 priority=3, target_file=str(md_file))
@@ -1115,6 +1166,7 @@ A skill is a folder under `domains/skills/{name}/` containing one `SKILL.md`: YA
 ```markdown
 ---
 name: incident-response
+description: "What the skill does and the trigger phrases that should load it"
 last_verified: YYYY-MM-DD
 owner: "@owner"
 when_to_use: "trigger phrases or task types that should load this skill"
@@ -1134,6 +1186,8 @@ when_to_use: "trigger phrases or task types that should load this skill"
 | -------------- | ---- |
 | [real incident, cited] | [the rule that would have prevented it] |
 ```
+
+The `name` + `description` frontmatter pair follows the Agent Skills convention, so harnesses can discover ECL skills natively instead of relying on prompt instructions. Pi, for example, loads them via a `skills` entry in its settings (`{"skills": ["domains/skills"]}`) or a repeatable `--skill <path>` flag — the mandatory-lookup rule becomes harness-enforced.
 
 Verify by confirming an agent checks `domains/skills/` for a matching skill before a non-trivial task.
 
@@ -1323,6 +1377,7 @@ done
 2. Tier staleness SLAs appropriately; not everything needs daily re-verification.
 3. Lean skills prevent agents from wasting tokens on ad-hoc approaches to tasks that have well-defined processes.
 4. Batch small related tasks (e.g., backlinks for a single domain) into single larger tasks.
+5. Tier models by task kind: run `synthesise` and `conflict-review` on a frontier model; run `verify` and `backlink` on a cheaper one. With a multi-model harness such as [Pi](https://pi.dev/), this is a per-invocation setting in the worker, not provider-specific code.
 
 ---
 
@@ -1352,7 +1407,7 @@ Execute in order. Do not skip steps.
 - [ ] **Step 1**: Interview a human; identify 5–8 domains + a `skills` domain; write `meta/domain-index.md`
 - [ ] **Step 2**: Map data sources for each domain; document access methods, limitations, and staleness patterns
 - [ ] **Step 3**: Write domain-specific source authority tables; define conflict resolution hierarchy
-- [ ] **Step 4**: Create `meta/system-prompt.md` (complete), `meta/how-to-get-accurate-information.md` (empty template only, do not pre-fill)
+- [ ] **Step 4**: Create `meta/system-prompt.md` (complete), `meta/how-to-get-accurate-information.md` (empty template only, do not pre-fill), and the root `AGENTS.md` grounding file
 - [ ] **Human review**: Have a human review `meta/system-prompt.md` before any agent runs against it
 - [ ] **Step 5**: Implement task system (YAML schema, `claim_task()`, `release_task()`); think before coding, then TDD; achieve 90% coverage on locking logic
 - [ ] **Step 6**: Implement worker loop (`worker_loop()`, `execute_synthesise()`, `execute_skill_verify()`); use TDD + subagent execution

@@ -42,7 +42,9 @@ This project contains three documents, each written for a different reader:
 
 **If you want to understand the system:** read `readme-for-humans.md`.
 
-**If you want to build the system using an LLM agent:** give `readme-for-agents.md` to Claude Code or Codex and tell it to follow the Quick-Start Checklist. The document contains complete, runnable Python for every component.
+**If you want to build the system using an LLM agent:** give `readme-for-agents.md` to Claude Code, Codex, or [Pi](https://pi.dev/) and tell it to follow the Quick-Start Checklist. The document contains complete, runnable Python for every component.
+
+A fourth file, **`AGENTS.md`**, is the harness-level grounding hook: agent harnesses load it automatically from the repo root, so every agent session (bootstrap, worker, or query) starts pointed at the right ECL files without per-prompt preambles.
 
 **If you want to deploy and operate a running ECL:** continue reading this file.
 
@@ -58,6 +60,7 @@ ecl-repo/
 ├── README.md                          ← This file
 ├── readme-for-agents.md               ← Build specification for LLM agents
 ├── readme-for-humans.md               ← Conceptual background and design rationale
+├── AGENTS.md                          ← Harness-level grounding: points every agent session at meta/ and skills
 │
 ├── meta/                              ← The three files every agent reads before every run
 │   ├── system-prompt.md               ← Agent identity, rules, citation format, source authority
@@ -102,6 +105,10 @@ ecl-repo/
 ---
 
 ## Key Files Explained
+
+### `AGENTS.md`
+
+The harness-level grounding file at the repo root. Pi, Claude Code, and Codex load it automatically at session start; it directs every agent to read `meta/system-prompt.md` and `meta/domain-index.md` and to check `domains/skills/` before acting. This means bootstrap, worker, and query sessions are all ECL-grounded without repeating the preamble in every prompt.
 
 ### `meta/system-prompt.md`
 
@@ -153,7 +160,7 @@ Drift detection reports and agent error logs. Drift reports summarise which file
 
 ### Step 1 Bootstrap with an LLM agent
 
-The ECL is built by an LLM agent following `readme-for-agents.md`. Open Claude Code (or Codex) in this repository and give it this prompt:
+The ECL is built by an LLM agent following `readme-for-agents.md`. Open Claude Code, Codex, or [Pi](https://pi.dev/) in this repository and give it this prompt:
 
 ```
 Read readme-for-agents.md fully. Then follow the Quick-Start Checklist at the bottom of that document.
@@ -204,7 +211,7 @@ The maintenance agent scans every domain for stale content, missing files, unres
 
 ### Step 5 Query the ECL
 
-**Recommended:** Give Claude Code access to the repository with this system prompt:
+**Recommended:** Give Claude Code — or [Pi](https://pi.dev/), if you want to query with different models — access to the repository with this system prompt:
 
 ```
 You are answering questions using the Enterprise Context Layer in this repository.
