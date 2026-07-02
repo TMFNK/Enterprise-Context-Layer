@@ -21,7 +21,7 @@
 
 - **ECL Pattern (Andy Chen):** Synthesis over retrieval. Folder structure as taxonomy. Backlinks as context graph.
 - **C-Compiler Pattern (Nicholas Carlini, Anthropic):** Git push-rejection as a distributed mutex. No coordinator service needed.
-- **Superpowers Pattern (Jesse Vincent):** `SKILL.md` files as mandatory agent workflows. Load the skill before the task.
+- **Lean Skills Pattern (tw93, inspired by Waza):** Small, single-purpose `SKILL.md` files as mandatory agent workflows, one skill per task type, no automatic chaining. Load the matching skill before the task.
 
 **Start here →** [Quick-Start Checklist](#quick-start-checklist)
 
@@ -41,7 +41,7 @@
 10. [Step 7 Seed Initial Content](#step-7-seed-initial-content)
 11. [Step 8 Run the Maintenance Agent](#step-8-run-the-maintenance-agent)
 12. [Step 9 Build the Query Interface](#step-9-build-the-query-interface)
-13. [Superpowers Integration](#superpowers-integration)
+13. [Lean Skills Integration](#lean-skills-integration)
 14. [Citation Rules](#citation-rules)
 15. [Conflict Resolution](#conflict-resolution)
 16. [Drift Detection and Staleness](#drift-detection-and-staleness)
@@ -133,7 +133,7 @@ Every ECL file must include a `last_verified` front-matter field.
                              │  search / read / fetch
                              ▼
 ┌──────────────────────────────────────────────────────────────────────────┐
-│              WORKER AGENTS  (parallel, Superpowers-enabled)              │
+│              WORKER AGENTS  (parallel, lean-skills-enabled)              │
 │                                                                          │
 │  1. Pull latest ECL from git                                             │
 │  2. Read relevant SKILL.md from domains/skills/                          │
@@ -151,7 +151,7 @@ Every ECL file must include a `last_verified` front-matter field.
 │  tasks/         ← YAML task queue + .LOCKED sidecar files               │
 │  domains/       ← one folder per knowledge domain                       │
 │    product/  engineering/  gtm/  legal/  people/  security/  ...        │
-│    skills/  ← Superpowers SKILL.md files for team workflows             │
+│    skills/  ← Lean SKILL.md files for team workflows                    │
 │  sources/       ← cited source snapshots (read-only)                    │
 │  logs/          ← drift reports, error logs                             │
 └────────────────────────────┬─────────────────────────────────────────────┘
@@ -159,7 +159,7 @@ Every ECL file must include a `last_verified` front-matter field.
                              ▼
 ┌──────────────────────────────────────────────────────────────────────────┐
 │                  QUERY INTERFACE                                         │
-│  Claude Code + Superpowers (recommended) · Direct API · Full RAG        │
+│  Claude Code (recommended) · Direct API · Full RAG                      │
 └──────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -194,7 +194,7 @@ ecl-repo/
 │   │   └── mapping-notes.md                   ← Agent run log: timestamps, sources, findings
 │   ├── {domain-2}/
 │   │   └── ...
-│   └── skills/                                ← Superpowers SKILL.md files
+│   └── skills/                                ← Lean SKILL.md files
 │       ├── README.md
 │       ├── {workflow-name}/
 │       │   └── SKILL.md
@@ -242,7 +242,7 @@ A domain is a coherent area of company knowledge with clear ownership, defined s
 2. **Ask the human:** _What questions do people most often ask that get wrong answers?_ Group them.
 3. **Ask the human:** _What knowledge would be lost if your three most experienced people left tomorrow?_ Those gaps are high-priority domains.
 4. **Start with 5–8 domains.** More than 12 usually means domains are too granular.
-5. **Always include a `skills` domain** for Superpowers SKILL.md files.
+5. **Always include a `skills` domain** for lean SKILL.md files.
 6. **Assign a human owner** for each domain.
 
 **Typical domains by company type:**
@@ -267,7 +267,7 @@ Create this file with the following structure:
 | GTM         | domains/gtm/         | @sales-ops        | Salesforce, Gong, Slack #sales          | High staleness risk        |
 | Legal       | domains/legal/       | @general-counsel  | Legal docs, contracts, policy documents | Many ROUTE-NOT-ANSWER      |
 | People      | domains/people/      | @hr-lead          | HRIS, org chart, Slack #general         |                            |
-| Skills      | domains/skills/      | @engineering-lead | Team retros, runbooks, PRs              | Superpowers SKILL.md files |
+| Skills      | domains/skills/      | @engineering-lead | Team retros, runbooks, PRs              | Lean SKILL.md files |
 ```
 
 **Done when:** `meta/domain-index.md` exists with all domains named, owners assigned, and primary sources documented.
@@ -370,18 +370,18 @@ representation of how [Company Name] actually works across all domains.
 
 You are not a search engine. You are not a Q&A bot. You build institutional memory.
 
-## Superpowers Skills Mandatory Lookup
+## Lean Skills Mandatory Lookup
 
 Before any non-trivial task, check `domains/skills/` for a relevant SKILL.md.
 If a skill exists for your task type, read it and follow it. Skills are mandatory
-workflows, not suggestions.
+workflows once loaded, not suggestions, but each is scoped to one task type and
+does not chain into other skills automatically.
 
 Required lookups:
 
-- Synthesising a complex or cross-domain topic → load `brainstorming` skill
-- Writing or modifying ECL tooling code → load `writing-plans` + `subagent-driven-development` skill
-- Pushing a large synthesise batch → load `requesting-code-review` skill
-- Unexpected or contradictory source results → load `systematic-debugging` skill
+- Handling a severity-1 incident → load `incident-response` skill
+- Walking a deal through negotiation → load `closing-a-deal` skill
+- Handling a customer data export/deletion request → load `customer-data-request` skill
 
 ## Non-Negotiable Rules
 
@@ -462,7 +462,7 @@ Reason: what you found. Citation: [[source]](path). -->
 
 ## Tool Usage Notes
 
-## Superpowers Skill Effectiveness Notes
+## Skill Effectiveness Notes
 
 <!-- Which skills proved most useful for which task types?
      Which tasks went wrong before a skill was added?
@@ -482,7 +482,7 @@ Use the completed output from Step 1.
 **Inputs:** Initialised repository with meta files.
 **Goal:** Implement the YAML task queue and file-based distributed locking.
 
-**Before writing code:** If Superpowers is available, load the `writing-plans` and `subagent-driven-development` skills. Implement with RED → GREEN → REFACTOR on every function.
+**Before writing code:** Think before coding: read the relevant meta/ files, state your plan, then implement with RED → GREEN → REFACTOR on every function.
 
 ### Task file schema
 
@@ -500,7 +500,7 @@ source_hints:
 metadata:
   target_file: domains/product/feature-flags.md
   last_synthesised: null
-  superpowers_skill: null # optional: path to SKILL.md agent should load before executing
+  skill_path: null # optional: path to SKILL.md agent should load before executing
 ```
 
 ### Task kinds
@@ -640,7 +640,7 @@ def release_task(task: dict, success: bool = True):
 **Inputs:** Implemented task system (Step 5). `meta/` files populated (Step 4).
 **Goal:** A running agent process that claims tasks, executes them, and releases them.
 
-**Before writing code:** Load the `writing-plans` and `subagent-driven-development` skills. Implement with RED → GREEN → REFACTOR on every function.
+**Before writing code:** Think before coding: read the relevant meta/ files, state your plan, then implement with RED → GREEN → REFACTOR on every function.
 
 ### Complete worker loop
 
@@ -676,7 +676,7 @@ def execute_synthesise(task: dict):
     """
     domain = task["domain"]
     target_file = task["metadata"]["target_file"]
-    skill_path = task["metadata"].get("superpowers_skill")
+    skill_path = task["metadata"].get("skill_path")
 
     # 1. Read mandatory context files
     system_prompt = Path("meta/system-prompt.md").read_text()
@@ -819,7 +819,7 @@ INSTRUCTIONS:
 3. **Historical snapshots**: Export recent Slack threads, Jira tickets, and Gong call summaries for the most business-critical topics. Place in `sources/slack/`, `sources/jira/`, `sources/calls/`.
 4. **Org chart**: Export to `domains/people/org-chart.md`.
 5. **Known conflicts**: Create stub conflict notes for areas already known to have documentation disagreements.
-6. **Superpowers skill stubs**: For each skill in the table below, create a stub `SKILL.md` in `domains/skills/{name}/`. Workers will iterate on these.
+6. **Lean skill stubs**: For each skill in the table below, create a stub `SKILL.md` in `domains/skills/{name}/`. Workers will iterate on these.
 
 **Initial skills to create stubs for:**
 
@@ -913,7 +913,7 @@ def get_last_verified(md_file: Path) -> datetime | None:
 
 def create_task(domain: str, kind: str, description: str, priority: int,
                 target_file: str = None, source_hints: list = None,
-                superpowers_skill: str = None):
+                skill_path: str = None):
     """Create a new task YAML file in tasks/."""
     ts = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S")
     import hashlib
@@ -928,7 +928,7 @@ def create_task(domain: str, kind: str, description: str, priority: int,
         "source_hints": source_hints or [],
         "metadata": {
             "target_file": target_file,
-            "superpowers_skill": superpowers_skill,
+            "skill_path": skill_path,
         }
     }
     Path(filename).write_text(yaml.dump(task, default_flow_style=False))
@@ -1018,7 +1018,7 @@ def maintenance_scan():
 | Competitive landscape               | 14 days     |
 | People / roles                      | 30 days     |
 | Process documentation               | 30 days     |
-| Superpowers skills                  | 30 days     |
+| Lean skills                         | 30 days     |
 | Regulatory / compliance             | 30 days     |
 | Technical architecture              | 90 days     |
 | Historical analysis                 | Never       |
@@ -1032,13 +1032,9 @@ def maintenance_scan():
 **Inputs:** ECL with at least one full maintenance + worker cycle completed.
 **Goal:** A way for humans and other agents to query the ECL and receive cited, conflict-aware answers.
 
-### Option A Claude Code + Superpowers (recommended)
+### Option A Claude Code (recommended)
 
-Give Claude Code access to the ECL repository. Install Superpowers if not already installed:
-
-```bash
-/plugin install superpowers@claude-plugins-official
-```
+Give Claude Code access to the ECL repository.
 
 Use this system prompt for queries:
 
@@ -1053,7 +1049,6 @@ Before answering:
 For every claim in your answer, cite the ECL file you found it in using [[description]](path).
 If the ECL documents a conflict on this topic, present both sides; never hide them.
 If the ECL says to route a question, tell the user who to route to and why.
-If you are designing a solution, follow the brainstorming skill before producing output.
 Surface last_verified dates for any claim that is time-sensitive.
 ```
 
@@ -1109,32 +1104,53 @@ Regardless of option:
 
 ---
 
-## Superpowers Integration
+## Lean Skills Integration
 
-[Superpowers](https://github.com/obra/superpowers) is an agentic skills framework that gives agents a mandatory process (not just a prompt) for complex tasks. It integrates with the ECL at three levels.
+The **Lean Skills Pattern** (inspired by [Waza](https://github.com/tw93/Waza), tw93) gives agents a mandatory process for one workflow at a time, without chaining into a larger multi-skill pipeline. It integrates with the ECL at three levels. No external plugin install is required, `domains/skills/` is the whole mechanism.
 
-### Install Superpowers (Claude Code)
+### The Lean Skill Format
 
-```bash
-/plugin install superpowers@claude-plugins-official
+A skill is a folder under `domains/skills/{name}/` containing one `SKILL.md`: YAML frontmatter naming the skill and its trigger phrases, followed by a single concise playbook.
+
+```markdown
+---
+name: incident-response
+last_verified: YYYY-MM-DD
+owner: "@owner"
+when_to_use: "trigger phrases or task types that should load this skill"
+---
+
+# [Skill Name]
+
+[One sentence: what "done right" looks like for this task type.]
+
+## Hard Rules
+
+- [Non-negotiable step, tied to an ECL citation].
+
+## Gotchas
+
+| What happened | Rule |
+| -------------- | ---- |
+| [real incident, cited] | [the rule that would have prevented it] |
 ```
 
-Verify by asking Claude Code to brainstorm a feature, the `brainstorming` skill should activate automatically.
+Verify by confirming an agent checks `domains/skills/` for a matching skill before a non-trivial task.
 
 ### Integration Point 1 ECL as Agent Grounding
 
-Before any Superpowers agent brainstorms or writes a plan, it must read the relevant ECL files. Without this, agents propose architectures inconsistent with existing decisions, miss escalation rules, and re-discover documented conflicts.
+Before any agent brainstorms or writes a plan, it must read the relevant ECL files. Without this, agents propose architectures inconsistent with existing decisions, miss escalation rules, and re-discover documented conflicts.
 
-Add this preamble to all Superpowers task prompts:
+Add this preamble to all design/planning task prompts:
 
 ```
-Before brainstorming, read:
+Before designing, read:
 - meta/domain-index.md          ← full knowledge map
 - meta/system-prompt.md         ← company operating rules
 - domains/{relevant-domain}/README.md
 - domains/{relevant-domain}/{topic}.md  ← directly relevant files
 
-After reading, proceed with the brainstorming skill.
+After reading, proceed with the design.
 Design decisions must be consistent with ECL content.
 Decisions that conflict with ECL content must create a conflict note.
 ```
@@ -1152,22 +1168,21 @@ Team workflows stored as `SKILL.md` files in `domains/skills/` become first-clas
 
 **When a skill is first created or substantially revised, a human must review it** before agents are instructed to follow it. Record this review in `mapping-notes.md`.
 
-### Integration Point 3 Superpowers as the ECL Build Methodology
+### Integration Point 3 Ordinary Engineering Discipline as the ECL Build Methodology
 
-When building or extending any ECL tooling (runner, worker, query interface), use the Superpowers workflow:
+When building or extending any ECL tooling (runner, worker, query interface), think before coding, then use TDD:
 
 ```
-1. brainstorming skill        ← Read ECL meta/ files first; refine design through questions
-2. writing-plans skill        ← Break into 2–5 minute TDD tasks with file paths and assertions
-3. subagent-driven-development ← RED → GREEN → REFACTOR per task; two-stage review after each
-4. requesting-code-review     ← After each batch; critical issues block progress
-5. finishing-a-development-branch ← Verify all tests pass; present merge/discard options
+1. Think before coding             ← Read ECL meta/ files first; state assumptions and tradeoffs
+2. Write the simplest correct fix  ← Break into small TDD tasks with file paths and assertions
+3. RED → GREEN → REFACTOR          ← Per task; review your own diff against the plan
+4. Verify before claiming done     ← Run tests; confirm the specific behaviour asked for
 ```
 
 **Minimum test coverage for ECL tooling:**
 
 | Component               | Minimum coverage | Critical paths                                   |
-| ----------------------- | ---------------- | ------------------------------------------------ |
+| ------------------------ | ----------------- | --------------------------------------------------- |
 | Task locking / claiming | 90%              | Concurrent claim race; stale lock reclaim        |
 | Git push / retry logic  | 85%              | Push rejection; exponential backoff              |
 | Drift detection         | 80%              | Source change detection; SLA evaluation          |
@@ -1209,7 +1224,7 @@ with EMEA deals typically discounted 15–20%
 - A Gong call with ID or date
 - A Jira ticket number
 - A commit hash or specific line in source code
-- A Superpowers skill file (for process claims)
+- A lean skill file (for process claims)
 
 ### Three-source corroboration rule
 
@@ -1262,7 +1277,7 @@ Common drift sources:
 - A feature is deprecated but still documented as active
 - A policy document is updated but the ECL cites the old version
 - A person changes roles but is still listed as domain owner
-- A Superpowers skill describes a process the team has since changed
+- A lean skill describes a process the team has since changed
 
 ### Drift severity
 
@@ -1306,7 +1321,7 @@ done
 
 1. Use `source_hints` to pre-select which sources a worker reads; avoid full-repo scans per task.
 2. Tier staleness SLAs appropriately; not everything needs daily re-verification.
-3. Superpowers skills prevent agents from wasting tokens on ad-hoc approaches to tasks that have well-defined processes.
+3. Lean skills prevent agents from wasting tokens on ad-hoc approaches to tasks that have well-defined processes.
 4. Batch small related tasks (e.g., backlinks for a single domain) into single larger tasks.
 
 ---
@@ -1339,12 +1354,11 @@ Execute in order. Do not skip steps.
 - [ ] **Step 3**: Write domain-specific source authority tables; define conflict resolution hierarchy
 - [ ] **Step 4**: Create `meta/system-prompt.md` (complete), `meta/how-to-get-accurate-information.md` (empty template only, do not pre-fill)
 - [ ] **Human review**: Have a human review `meta/system-prompt.md` before any agent runs against it
-- [ ] **Superpowers**: Install Superpowers: `/plugin install superpowers@claude-plugins-official`
-- [ ] **Step 5**: Implement task system (YAML schema, `claim_task()`, `release_task()`); use Superpowers `writing-plans` + `subagent-driven-development` workflow; achieve 90% coverage on locking logic
+- [ ] **Step 5**: Implement task system (YAML schema, `claim_task()`, `release_task()`); think before coding, then TDD; achieve 90% coverage on locking logic
 - [ ] **Step 6**: Implement worker loop (`worker_loop()`, `execute_synthesise()`, `execute_skill_verify()`); use TDD + subagent execution
 - [ ] **Step 7**: Seed: domain READMEs, existing docs as source snapshots, org chart, known conflicts, six initial skill stubs in `domains/skills/`
 - [ ] **Step 8**: Start maintenance agent on 6-hour schedule; confirm it creates tasks for staleness, missing mapping-notes, and stale skills
-- [ ] **Step 9**: Build query interface (start with Claude Code + Superpowers; migrate to RAG only if needed)
+- [ ] **Step 9**: Build query interface (start with Claude Code; migrate to RAG only if needed)
 - [ ] **Ongoing**: Monitor `logs/` for errors and drift reports; let `meta/how-to-get-accurate-information.md` grow from agent experience; review skill files after team workflow changes; update skills when referenced ECL content drifts
 
 ---
@@ -1367,9 +1381,9 @@ Execute in order. Do not skip steps.
 | **Task**                                 | A YAML file in `tasks/` representing one unit of work for a worker agent                                                                |
 | **Worker agent**                         | An LLM agent running the claim → execute → release loop                                                                                 |
 | **Maintenance agent**                    | A separate scheduled process that scans for staleness, gaps, and drift, and creates tasks for workers                                   |
-| **Superpowers**                          | An agentic skills framework by Jesse Vincent; provides composable `SKILL.md` files that agents load and follow                          |
-| **Skill (Superpowers)**                  | A `SKILL.md` file describing a mandatory workflow for a specific task type; agents check for relevant skills before non-trivial actions |
-| **ECL grounding**                        | Reading ECL domain files before a Superpowers agent brainstorms or plans anchors design in real architecture                            |
+| **Waza**                                 | A lean agentic skills framework by tw93; this project's Lean Skills Pattern is inspired by its `SKILL.md` shape                          |
+| **Skill (lean)**                         | A `SKILL.md` file describing a mandatory workflow for one specific task type; agents check for relevant skills before non-trivial actions and don't chain skills automatically |
+| **ECL grounding**                        | Reading ECL domain files before an agent brainstorms or plans anchors design in real architecture                            |
 | **Staleness SLA**                        | Maximum age of an ECL claim before re-verification is required; varies by claim type                                                    |
 | **Drift**                                | The ECL was correct when written but the world has since changed                                                                        |
 | **Tribal knowledge**                     | Institutional memory held by individuals, not written down is the ECL's most valuable and hardest target                                |
@@ -1380,4 +1394,4 @@ Execute in order. Do not skip steps.
 
 ---
 
-_Based on Andy Chen's [The Enterprise Context Layer](https://andychen32.substack.com/p/the-enterprise-context-layer), Nicholas Carlini's [Building a C Compiler with Parallel Claudes](https://www.anthropic.com/engineering/building-c-compiler), and Jesse Vincent's [Superpowers](https://github.com/obra/superpowers)._
+_Based on Andy Chen's [The Enterprise Context Layer](https://andychen32.substack.com/p/the-enterprise-context-layer), Nicholas Carlini's [Building a C Compiler with Parallel Claudes](https://www.anthropic.com/engineering/building-c-compiler), and tw93's [Waza](https://github.com/tw93/Waza)._

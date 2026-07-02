@@ -26,7 +26,7 @@ Three design patterns make this work:
 
 **C-Compiler Pattern** (Nicholas Carlini, Anthropic, [Building a C Compiler with Parallel Claudes](https://www.anthropic.com/engineering/building-c-compiler)): Multiple agents coordinate without a central broker. Each task is a YAML file in `tasks/`. An agent claims a task by writing a `.LOCKED` sidecar and pushing to git. If the push is rejected, another agent got there first. Git's push-rejection is the distributed mutex. No message broker, no database, no coordinator.
 
-**Superpowers Pattern** (Jesse Vincent, [Superpowers](https://github.com/obra/superpowers)): Agent quality comes from process discipline, not just prompt quality. Before any non-trivial task, agents load a `SKILL.md` file that defines the mandatory workflow for that task type. Team workflows are themselves stored as skill files inside the ECL, making process a first-class, versioned, citable artifact.
+**Lean Skills Pattern** (tw93, [Waza](https://github.com/tw93/Waza)): Agent quality comes from process discipline, not just prompt quality, but discipline should be scoped to exactly one workflow at a time. Team workflows are stored as small, single-purpose `SKILL.md` files, one skill per folder, with plain frontmatter naming its trigger phrases. An agent loads a skill only when a task matches, follows it as the mandatory workflow for that task, and stops; skills don't chain into an automatic multi-step pipeline. Team workflows are themselves stored as skill files inside the ECL, making process a first-class, versioned, citable artifact without the overhead of a heavier framework.
 
 ---
 
@@ -79,7 +79,7 @@ ecl-repo/
 │   ├── legal/
 │   ├── people/
 │   ├── security/
-│   └── skills/                        ← Superpowers SKILL.md files for team workflows
+│   └── skills/                        ← Lean SKILL.md files for team workflows (see Lean Skills Pattern)
 │       ├── incident-response/
 │       │   └── SKILL.md
 │       ├── closing-a-deal/
@@ -125,7 +125,7 @@ A synthesised topic file. Every factual claim has an inline citation tracing it 
 
 ### `domains/skills/{name}/SKILL.md`
 
-A Superpowers-compatible workflow file. When an agent encounters a task type that has a corresponding skill (incident response, closing a deal, customer data requests), it loads the skill file and follows the steps as a mandatory workflow, it is not a suggestion. Skills are maintained like any other ECL content: they have citations, `last_verified` dates, and get flagged for re-verification when the processes they describe change.
+A lean workflow file in the spirit of Waza's skill format: YAML frontmatter naming the skill and its trigger phrases, followed by a single concise playbook for one workflow. When an agent encounters a task type that has a corresponding skill (incident response, closing a deal, customer data requests), it loads the skill file and follows it as a mandatory workflow for that task, it is not a suggestion. Skills stay narrow and don't chain automatically into a larger pipeline. Skills are maintained like any other ECL content: they have citations, `last_verified` dates, and get flagged for re-verification when the processes they describe change.
 
 ### `tasks/*.yaml` and `tasks/*.LOCKED`
 
@@ -299,7 +299,7 @@ This project is an implementation template synthesising three published ideas:
 
 - **[The Enterprise Context Layer](https://andychen32.substack.com/p/the-enterprise-context-layer)**: Andy Chen's original design: synthesis over retrieval, git as single source of truth, the folder-as-taxonomy and backlinks-as-context-graph pattern.
 - **[Building a C Compiler with Parallel Claudes](https://www.anthropic.com/engineering/building-c-compiler)**: Nicholas Carlini's C-Compiler pattern: file-based distributed locking via git push-rejection, enabling parallel agents with no central broker.
-- **[Superpowers](https://github.com/obra/superpowers)**: Jesse Vincent's agentic skills framework: `SKILL.md` files as mandatory agent workflows, process discipline as a first-class engineering concern.
+- **[Waza](https://github.com/tw93/Waza)**: tw93's lean skills framework: single-purpose `SKILL.md` files with trigger-phrase frontmatter, loaded on match and followed once rather than chained into a mandatory multi-skill pipeline. This project's Lean Skills Pattern adapts that shape for ECL's own domain workflows.
 
 The 10-step build process, task schema, staleness SLA tables, and repository structure are this project's extrapolation from those sources. This is one way to implement the pattern, but not the only way.
 
