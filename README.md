@@ -16,6 +16,68 @@ The difference is **synthesis over retrieval**. The ECL encodes the reasoning fr
 
 ---
 
+## Für deutsche Unternehmen, kurz gefasst
+
+Unternehmenswissen liegt selten an einem Ort: Es steckt in Slack-Threads, Confluence-Seiten, Jira-Tickets und im Kopf einzelner Mitarbeiter, und die Quellen widersprechen sich oft, ohne dass jemand weiß, welche Version stimmt. Der Enterprise Context Layer löst das anders als eine klassische Suche oder ein Chatbot: mehrere LLM-Agenten lesen fortlaufend die echten Quellsysteme und schreiben synthetisiertes, mit Zitaten belegtes Wissen in ein Git-Repository. Widersprüche zwischen Quellen werden dokumentiert statt stillschweigend aufgelöst, sensible Fragen werden an die richtige Stelle weitergeleitet statt beantwortet. Keine Vektordatenbank, keine Ontologie, nur versionierte Markdown-Dateien, die jedes LLM nativ lesen kann und jeder Mitarbeiter mit `git clone` einsehen kann.
+
+Beratung und Umsetzung: [mbitai.com](https://www.mbitai.com).
+
+---
+
+## The Main Idea
+
+Most institutional knowledge tooling is hand-built: someone writes a wiki page or a Confluence doc, and it goes stale the moment the real process changes. This project turns that around. Instead of a human authoring and maintaining knowledge pages, LLM agents continuously read the company's actual source systems and write the synthesis themselves: citing what they found, flagging what conflicts, and re-verifying whichever files have drifted.
+
+Everything is coordinated through the one thing every source and every agent can already reach: the git repository itself.
+
+```
+┌──────────────────────────────────────────────────────────────┐
+│                      YOUR DATA SOURCES                       │
+│     Slack · Jira · Confluence · Source Code · Gong · CRM     │
+└──────────────────────────────────────────────────────────────┘
+                                │ read
+                                ▼                               
+┌──────────────────────────────────────────────────────────────┐
+│             WORKER AGENTS (as many as you want)              │
+│                                                              │
+│  1. Pull the ECL, claim a task (git push-rejection = lock)   │
+│  2. Load a lean skill from domains/skills/, if one matches   │
+│  3. Read the cited sources, synthesise, write citations      │
+│  4. Commit, push, release the task                           │
+└──────────────────────────────────────────────────────────────┘
+                                │ write
+                                ▼                               
+┌──────────────────────────────────────────────────────────────┐
+│                    THE ECL GIT REPOSITORY                    │
+│                                                              │
+│  meta/     rules, source authority, domain map               │
+│  tasks/    the distributed task queue (YAML + .LOCKED)       │
+│  domains/  synthesised knowledge, cited and conflict-aware   │
+│  sources/  read-only snapshots of what was cited             │
+│                                                              │
+│  A maintenance agent scans this repo on a schedule and       │
+│  writes new files into tasks/ when content goes stale.       │
+└──────────────────────────────────────────────────────────────┘
+                                │ read
+                                ▼                               
+┌──────────────────────────────────────────────────────────────┐
+│                       QUERY INTERFACE                        │
+│     Claude Code, Pi, or any LLM given access to the repo     │
+│    → cited, conflict-aware answers; routes sensitive ones    │
+└──────────────────────────────────────────────────────────────┘
+```
+
+Four things happen in a loop, indefinitely:
+
+1. **A maintenance agent** scans every domain on a schedule (every 6 hours is typical) for stale content, missing files, and unresolved conflicts, and drops new task files into `tasks/`.
+2. **Worker agents** — one, or twenty, running anywhere — pull the repo and race to claim a task. Git's push-rejection is the only coordination mechanism: whoever's push lands first owns the task, everyone else moves on. No broker, no database, no central scheduler to keep alive.
+3. **Each worker synthesises**: it reads the primary sources named in the task, writes a cited Markdown file (or documents a conflict instead of guessing), and pushes the result.
+4. **The query interface reads the same repository** the workers just wrote to, so every answer — whether asked by a human or another agent — is grounded in exactly the citations, conflicts, and routing rules the fleet has already worked out.
+
+There is no vector database and no ontology to keep in sync. The folder structure is the taxonomy, the backlinks between files are the knowledge graph, and `git log` is the full history of how the company's understanding of itself evolved.
+
+---
+
 ## How It Works
 
 The ECL is a Git repository of Markdown files. LLM agents read your company's source systems (Slack, Jira, Confluence, source code, Gong calls, Salesforce) and write synthesised, cited knowledge files into the repo. Every claim has an inline citation. Every conflict between sources is documented explicitly rather than silently resolved. The git history is the audit trail.
@@ -309,14 +371,6 @@ This project is an implementation template synthesising three published ideas:
 - **[Waza](https://github.com/tw93/Waza)**: tw93's lean skills framework: single-purpose `SKILL.md` files with trigger-phrase frontmatter, loaded on match and followed once rather than chained into a mandatory multi-skill pipeline. This project's Lean Skills Pattern adapts that shape for ECL's own domain workflows.
 
 The 10-step build process, task schema, staleness SLA tables, and repository structure are this project's extrapolation from those sources. This is one way to implement the pattern, but not the only way.
-
----
-
-## Für deutsche Unternehmen, kurz gefasst
-
-Unternehmenswissen liegt selten an einem Ort: Es steckt in Slack-Threads, Confluence-Seiten, Jira-Tickets und im Kopf einzelner Mitarbeiter, und die Quellen widersprechen sich oft, ohne dass jemand weiß, welche Version stimmt. Der Enterprise Context Layer löst das anders als eine klassische Suche oder ein Chatbot: mehrere LLM-Agenten lesen fortlaufend die echten Quellsysteme und schreiben synthetisiertes, mit Zitaten belegtes Wissen in ein Git-Repository. Widersprüche zwischen Quellen werden dokumentiert statt stillschweigend aufgelöst, sensible Fragen werden an die richtige Stelle weitergeleitet statt beantwortet. Keine Vektordatenbank, keine Ontologie, nur versionierte Markdown-Dateien, die jedes LLM nativ lesen kann und jeder Mitarbeiter mit `git clone` einsehen kann.
-
-Beratung und Umsetzung: [mbitai.com](https://www.mbitai.com).
 
 ---
 
