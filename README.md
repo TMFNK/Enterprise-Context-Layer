@@ -36,7 +36,7 @@ Everything is coordinated through the one thing every source and every agent can
 │     Slack · Jira · Confluence · Source Code · Gong · CRM     │
 └──────────────────────────────────────────────────────────────┘
                                 │ read
-                                ▼                               
+                                ▼
 ┌──────────────────────────────────────────────────────────────┐
 │             WORKER AGENTS (as many as you want)              │
 │                                                              │
@@ -46,7 +46,7 @@ Everything is coordinated through the one thing every source and every agent can
 │  4. Commit, push, release the task                           │
 └──────────────────────────────────────────────────────────────┘
                                 │ write
-                                ▼                               
+                                ▼
 ┌──────────────────────────────────────────────────────────────┐
 │                    THE ECL GIT REPOSITORY                    │
 │                                                              │
@@ -59,7 +59,7 @@ Everything is coordinated through the one thing every source and every agent can
 │  writes new files into tasks/ when content goes stale.       │
 └──────────────────────────────────────────────────────────────┘
                                 │ read
-                                ▼                               
+                                ▼
 ┌──────────────────────────────────────────────────────────────┐
 │                       QUERY INTERFACE                        │
 │     Claude Code, Pi, or any LLM given access to the repo     │
@@ -378,10 +378,10 @@ The 10-step build process, task schema, staleness SLA tables, and repository str
 
 Built by [mbitai](https://www.mbitai.com), freelance data and AI engineering for German businesses, with a focus on practical, privacy-first machine learning that runs where your data already lives. The Enterprise Context Layer is part of that portfolio.
 
-Want to apply this to your own institutional knowledge, data or AI engineering work? Get in touch at [www.mbitai.com](https://www.mbitai.com).
-
 ---
 
 ## Licence
 
-GPL-3.0: free for all uses, but improvements must be contributed back to the community.
+AGPL-3.0 (see [LICENSE](LICENSE)).
+
+For commercial licensing without AGPL obligations, or help applying this to your own master data, contact [www.mbitai.com](https://www.mbitai.com).
